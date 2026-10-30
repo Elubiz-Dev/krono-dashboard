@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    <linearGradient id="chromeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="30%" stop-color="#cccccc"/>
+      <stop offset="60%" stop-color="#888888"/>
+      <stop offset="100%" stop-color="#444444"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#aaaaaa"/>
+      <stop offset="100%" stop-color="#333333"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Black background circle -->
+  <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
+  
+  <!-- Orbital ellipse ring (behind K) -->
+  <ellipse cx="108" cy="115" rx="72" ry="28" 
+           stroke="url(#ringGrad)" stroke-width="3.5" fill="none"
+           transform="rotate(-18, 108, 115)" filter="url(#softGlow)"
+           opacity="0.85"/>
+  
+  <!-- K Letter - Vertical spine (sharp angular) -->
+  <polygon points="72,30 82,30 78,100 82,170 72,170 68,100" 
+           fill="url(#chromeGrad)" filter="url(#glow)"/>
+  
+  <!-- K Upper arm - angular blade pointing upper right -->
+  <polygon points="78,95 82,100 140,38 148,30 136,28 80,88" 
+           fill="url(#chromeGrad)" filter="url(#glow)"/>
+  
+  <!-- K Upper arm spike tip -->
+  <polygon points="138,28 156,22 148,36 136,28" 
+           fill="url(#chromeGrad)" filter="url(#glow)"/>
+  
+  <!-- K Lower arm - angular blade pointing lower right -->
+  <polygon points="78,106 82,100 148,162 156,172 140,170 80,110"
+           fill="url(#chromeGrad)" filter="url(#glow)"/>
+  
+  <!-- K Lower arm spike tip -->
+  <polygon points="148,164 156,174 140,172 148,162"
+           fill="url(#chromeGrad)" filter="url(#glow)"/>
+  
+  <!-- Upper spike from K top -->
+  <polygon points="72,30 82,30 79,14 76,2 73,14"
+           fill="url(#chromeGrad)" filter="url(#glow)"/>
+  
+  <!-- Lower spike from K bottom -->
+  <polygon points="72,170 82,170 79,186 76,198 73,186"
+           fill="url(#chromeGrad)" filter="url(#glow)"/>
+
+  <!-- Ring highlight arc top -->
+  <path d="M 48,100 Q 80,72 140,82" 
+        stroke="white" stroke-width="1.5" fill="none" opacity="0.6"/>
+  
+  <!-- Ring shadow arc bottom -->
+  <path d="M 48,132 Q 90,152 148,140" 
+        stroke="#555555" stroke-width="1" fill="none" opacity="0.8"/>
+</svg>
