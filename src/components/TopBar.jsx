@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import {
   PlusCircle, Download, Upload, Edit3, Save,
-  AlertCircle, Bell, RotateCcw, Printer
+  AlertCircle, RotateCcw, Printer, Cloud
 } from "lucide-react";
 
 const PAGE_TITLES = {
@@ -15,7 +15,8 @@ const PAGE_TITLES = {
 export function TopBar({
   activePage, isEditMode, setIsEditMode, activeUser, partner,
   onLogout, onOpenNewTx, onOpenDebtModal, onExportExcel, onImportExcel,
-  onReset, juanRemainingDebt, cashInHand, formatCOP
+  onReset, juanRemainingDebt, cashInHand, formatCOP,
+  cloudStatus = "synced", onSyncCloud
 }) {
   const fileRef = useRef(null);
   const { title, sub } = PAGE_TITLES[activePage] || PAGE_TITLES.overview;
@@ -31,6 +32,28 @@ export function TopBar({
 
       {/* Right: Actions */}
       <div className="topbar-right">
+        {/* Supabase Cloud Sync Status */}
+        <div
+          className={`topbar-cloud-pill pill-${cloudStatus}`}
+          onClick={onSyncCloud}
+          title={
+            cloudStatus === "synced"
+              ? "🟢 Sincronizado en tiempo real con Supabase"
+              : cloudStatus === "syncing"
+              ? "🔄 Sincronizando cambios con Supabase..."
+              : "🟡 Modo local (Haz clic para forzar sincronización)"
+          }
+        >
+          <Cloud size={14} className={cloudStatus === "syncing" ? "pulse-cloud" : ""} />
+          <span className="tcp-label">
+            {cloudStatus === "synced"
+              ? "Nube Activa"
+              : cloudStatus === "syncing"
+              ? "Sincronizando..."
+              : "Modo Local"}
+          </span>
+        </div>
+
         {/* Cash badge */}
         <div className="topbar-cash-badge">
           <span className="tcb-label">Caja</span>

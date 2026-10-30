@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { INITIAL_DATA } from "./data/initialData";
 import { calculateFinancials, formatCOP } from "./utils/financeCalculations";
 import { exportKronoToExcel, importKronoFromExcel } from "./utils/excelExportImport";
+import { fetchKronoStore, saveKronoStore, subscribeToKronoStore } from "./utils/supabaseClient";
 import { Sidebar } from "./components/Sidebar";
 import { OverviewPage } from "./pages/OverviewPage";
 import { CashflowPage } from "./pages/CashflowPage";
@@ -62,8 +63,9 @@ export function App() {
   const [reserveTargetWatch, setReserveTargetWatch] = useState(null);
   const [toast, setToast] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState("syncing"); // 'synced' | 'syncing' | 'offline'
 
-  // Persist all data
+  // Persist all data locally (offline fallback)
   useEffect(() => { localStorage.setItem("krono_transactions", JSON.stringify(transactions)); }, [transactions]);
   useEffect(() => { localStorage.setItem("krono_inventory_v3", JSON.stringify(inventory)); }, [inventory]);
   useEffect(() => { localStorage.setItem("krono_agreements", JSON.stringify(agreements)); }, [agreements]);
@@ -72,6 +74,74 @@ export function App() {
     if (activeUser) localStorage.setItem("krono_active_user", JSON.stringify(activeUser));
     else localStorage.removeItem("krono_active_user");
   }, [activeUser]);
+
+  // 1. SUPABASE INITIAL FETCH + REALTIME SYNC ACROSS DEVICES
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCloudData() {
+      setCloudStatus("syncing");
+      const cloudStore = await fetchKronoStore();
+      if (!isMounted) return;
+
+      if (cloudStore) {
+        if (Array.isArray(cloudStore.transactions)) setTransactions(cloudStore.transactions);
+        if (Array.isArray(cloudStore.inventory)) setInventory(cloudStore.inventory);
+        if (Array.isArray(cloudStore.agreements)) setAgreements(cloudStore.agreements);
+        if (cloudStore.lotConfig) setLotConfig(cloudStore.lotConfig);
+        setCloudStatus("synced");
+      } else {
+        // Initialize remote database on first run
+        const initialStore = { transactions, inventory, agreements, lotConfig };
+        const ok = await saveKronoStore(initialStore);
+        if (isMounted) setCloudStatus(ok ? "synced" : "offline");
+      }
+    }
+
+    loadCloudData();
+
+    // Listen to changes from other devices in real time (Juan / Elian live sync)
+    const unsubscribe = subscribeToKronoStore((remoteStore) => {
+      if (!isMounted || !remoteStore) return;
+      if (Array.isArray(remoteStore.transactions)) setTransactions(remoteStore.transactions);
+      if (Array.isArray(remoteStore.inventory)) setInventory(remoteStore.inventory);
+      if (Array.isArray(remoteStore.agreements)) setAgreements(remoteStore.agreements);
+      if (remoteStore.lotConfig) setLotConfig(remoteStore.lotConfig);
+      setCloudStatus("synced");
+      showToast("⚡ Datos sincronizados en vivo con Supabase.", "info");
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
+
+  // 2. AUTO-SAVE TO SUPABASE (Debounced 600ms)
+  const isFirstLoad = useRef(true);
+  useEffect(() => {
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;
+      return;
+    }
+
+    setCloudStatus("syncing");
+    const timer = setTimeout(async () => {
+      const ok = await saveKronoStore({ transactions, inventory, agreements, lotConfig });
+      setCloudStatus(ok ? "synced" : "offline");
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [transactions, inventory, agreements, lotConfig]);
+
+  const handleForceCloudSync = async () => {
+    setCloudStatus("syncing");
+    showToast("🔄 Sincronizando con Supabase...");
+    const ok = await saveKronoStore({ transactions, inventory, agreements, lotConfig });
+    setCloudStatus(ok ? "synced" : "offline");
+    if (ok) showToast("✅ Sincronizado correctamente con Supabase.");
+    else showToast("⚠️ Error de conexión con Supabase. Revisa la tabla krono_store.", "info");
+  };
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -343,6 +413,8 @@ export function App() {
           juanRemainingDebt={financials.juanRemainingDebt}
           cashInHand={financials.cashInHand}
           formatCOP={formatCOP}
+          cloudStatus={cloudStatus}
+          onSyncCloud={handleForceCloudSync}
         />
 
         <main className="page-content">
