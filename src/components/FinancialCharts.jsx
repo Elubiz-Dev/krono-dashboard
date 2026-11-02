@@ -7,6 +7,11 @@ import {
   Calendar,
   Target,
   Zap,
+  PackageCheck,
+  CheckCircle2,
+  ArrowRight,
+  ShieldCheck,
+  Layers,
 } from "lucide-react";
 
 export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
@@ -67,46 +72,49 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
   // Max value para escalar las barras
   const maxBarValue = 300000;
 
-  // ================= 2. PROCESAMIENTO DONUT DE DISTRIBUCIÓN DEL DINERO =================
-  const totalFinancialVolume =
-    fin.lotBaseCost +
-    fin.totalSupplies +
-    fin.reinvestmentFund50 +
-    fin.distributableProfit50;
+  // ================= 2. PROCESAMIENTO DONUT DE DISTRIBUCIÓN DEL DINERO & GANANCIAS =================
+  // Costo combinado de los lotes: 8 Invictas ($260k) + 6 Rolex ($200k) = $460.000 COP
+  const totalCombinedLotCost = fin.lotBaseCost || 460000;
+  const netCleanProfit = fin.netCleanProfitRemaining || 765000;
+  const partnerProfitShare = fin.netCleanProfit50Each || 382500;
+  const totalSuppliesAmt = fin.totalSupplies || 210500;
+
+  // Volumen financiero total proyectado del modelo de negocio
+  const totalFinancialVolume = totalCombinedLotCost + totalSuppliesAmt + netCleanProfit; // $1.435.500 COP
 
   const donutSlices = useMemo(() => {
     const data = [
       {
+        id: "profit-partners",
+        label: "Utilidad Líquida Socios (50%)",
+        amount: partnerProfitShare,
+        color: "#10b981", // Emerald
+        gradient: "linear-gradient(135deg, #34d399, #059669)",
+        desc: "Ganancia neta en efectivo para reparto equitativo entre Elian y Juan",
+      },
+      {
+        id: "profit-reinvest",
+        label: "Fondo Re-inversión Próximo Lote (50%)",
+        amount: partnerProfitShare,
+        color: "#06b6d4", // Cyan
+        gradient: "linear-gradient(135deg, #22d3ee, #0891b2)",
+        desc: "Capital protegido para autofinanciar la siguiente compra mayorista",
+      },
+      {
         id: "lot-cost",
-        label: "Inversión Base Lote (7 Relojes)",
-        amount: fin.lotBaseCost,
-        color: "#f43f5e", // Rose
-        gradient: "linear-gradient(135deg, #fb7185, #e11d48)",
-        desc: "Costo de compra inicial de la mercancía recuperado",
+        label: "Inversión en Mercancía (8 Invictas & 6 Rolex)",
+        amount: totalCombinedLotCost,
+        color: "#6366f1", // Electric Indigo (¡NADA DE ROJO!)
+        gradient: "linear-gradient(135deg, #818cf8, #4f46e5)",
+        desc: "Costo de compra de los 14 relojes ($260k Invictas + $200k Rolex). $420k ya retornados a caja (91.3%), restan solo $40k para $0 deuda",
       },
       {
         id: "supplies",
-        label: "Insumos & Operación (Empaques/Pilas)",
-        amount: fin.totalSupplies,
+        label: "Insumos & Operación (Empaques/Pilas/Tarjetas)",
+        amount: totalSuppliesAmt,
         color: "#f59e0b", // Amber
         gradient: "linear-gradient(135deg, #fbbf24, #d97706)",
-        desc: "Tarjetas, paños microfibra, bolsas de lujo y herramientas",
-      },
-      {
-        id: "rolex-fund",
-        label: "Fondo Re-inversión Rolex (50%)",
-        amount: fin.reinvestmentFund50,
-        color: "#06b6d4", // Cyan
-        gradient: "linear-gradient(135deg, #22d3ee, #0891b2)",
-        desc: "Reserva intocable para escalar a relojes de alta gama",
-      },
-      {
-        id: "profit-50",
-        label: "Ganancia Neta Distribuible (50/50)",
-        amount: fin.distributableProfit50,
-        color: "#e5b869", // Gold
-        gradient: "linear-gradient(135deg, #f7d788, #b88628)",
-        desc: "Utilidad disponible para reparto equitativo entre Elian y Juan",
+        desc: "Tarjetas de presentación, paños de microfibra, bolsas de lujo y kit de herramientas",
       },
     ];
 
@@ -125,22 +133,50 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
         angle,
       };
     });
-  }, [fin, totalFinancialVolume]);
+  }, [totalCombinedLotCost, netCleanProfit, partnerProfitShare, totalSuppliesAmt, totalFinancialVolume]);
 
-  // Hover default en el donut
+  // Hover default en el donut: Por defecto destacar la GANANCIA NETA TOTAL ($765.000)
+  const defaultDonutFocus = {
+    id: "total-profit",
+    percentage: 53.3,
+    amount: netCleanProfit,
+    color: "#10b981",
+    label: "Ganancia Neta Limpia",
+  };
+
   const currentDonutFocus = hoveredDonutSlice
-    ? donutSlices.find((s) => s.id === hoveredDonutSlice)
-    : donutSlices[3]; // Por defecto mostrar utilidad distribuible
+    ? donutSlices.find((s) => s.id === hoveredDonutSlice) || defaultDonutFocus
+    : defaultDonutFocus;
 
-  // ================= 3. CURVA / TERMÓMETRO FONDO ROLEX =================
-  const rolexGoal = 600000;
-  const currentRolexFund = fin.reinvestmentFund50 || 0;
-  const rolexProgressPct = Math.min(100, Math.round((currentRolexFund / rolexGoal) * 100));
-  const remainingForRolex = Math.max(0, rolexGoal - currentRolexFund);
+  // ================= 3. CONTROL DE LOTES ACTIVOS (8 INVICTAS & 6 ROLEX) =================
+  const activeLotsMetrics = useMemo(() => {
+    return {
+      invictaTotal: 8,
+      invictaSold: 3,
+      invictaNegotiation: 1,
+      invictaStock: 4,
+      invictaGrossPending: 85000 + 4 * 80000, // $405.000 COP
+      invictaDebtRecovery: 20000,
 
-  // Estimación de relojes Invicta restantes por vender (promedio de ganancia neta ~ $45.000 por reloj)
-  const avgProfitPerWatch = 45000;
-  const watchesNeeded = Math.ceil(remainingForRolex / (avgProfitPerWatch * 0.5));
+      rolexTotal: 6,
+      rolexSold: 2,
+      rolexStock: 4,
+      rolexGrossPending: 4 * 100000, // $400.000 COP
+      rolexDebtRecovery: 20000,
+
+      totalWatches: 14,
+      totalRemaining: 9,
+      totalGrossPending: 805000,
+      totalDebtRecovery: 40000,
+      totalNetProfit: 765000,
+      partnerBase50: 382500,
+
+      juanDebtToElian: 37000,
+      elianRolexAdvance: 60000,
+      elianNetPayout: 479500, // 382.500 + 60.000 + 37.000
+      juanNetPayout: 345500,  // 382.500 - 37.000
+    };
+  }, []);
 
   // Generador de arcos SVG para el gráfico de dona
   const radius = 70;
@@ -152,13 +188,13 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
       {/* Chart Section Header */}
       <div className="fc-header-strip">
         <div className="fc-title-box">
-          <div className="fc-icon-wrap">
-            <TrendingUp size={20} className="text-gold-light" />
+          <div className="fc-icon-wrap" style={{ background: "rgba(99, 102, 241, 0.12)", border: "1px solid rgba(99, 102, 241, 0.3)" }}>
+            <TrendingUp size={20} className="text-indigo" />
           </div>
           <div>
-            <h3 className="fc-title">Analítica Visual & Evolución de Capital</h3>
+            <h3 className="fc-title">Analítica Visual & Rendimiento de Capital</h3>
             <p className="fc-subtitle">
-              Métricas dinámicas de rotación de ventas, distribución de utilidades y fondo de escalamiento
+              Métricas dinámicas de rotación de ventas, distribución de utilidades y control de lotes activos
             </p>
           </div>
         </div>
@@ -174,7 +210,7 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
             className={`fc-tab-btn ${activeTab === "sales" ? "active" : ""}`}
             onClick={() => setActiveTab("sales")}
           >
-            Ventas Quincenales
+            Rentabilidad por Lote
           </button>
           <button
             className={`fc-tab-btn ${activeTab === "distribution" ? "active" : ""}`}
@@ -186,111 +222,139 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
             className={`fc-tab-btn ${activeTab === "rolex" ? "active" : ""}`}
             onClick={() => setActiveTab("rolex")}
           >
-            Meta Rolex
+            Lotes Activos (14 Relojes)
           </button>
         </div>
       </div>
 
       {/* Main Charts Grid */}
       <div className="fc-charts-grid">
-        {/* ================= PANEL 1: VENTAS POR QUINCENA ================= */}
+        {/* ================= PANEL 1: RENDIMIENTO & MARGEN POR LOTE (8 INVICTA vs 6 ROLEX) ================= */}
         {(activeTab === "all" || activeTab === "sales") && (
           <div className="dash-panel fc-card">
             <div className="panel-head">
               <div className="flex-row items-center gap-2">
-                <Calendar size={18} className="text-gold" />
-                <h4 className="panel-title">Ventas por Quincena</h4>
+                <TrendingUp size={18} className="text-emerald" />
+                <h4 className="panel-title">Rendimiento & Margen por Lote</h4>
               </div>
               <div className="fc-legend-row">
-                <span className="fc-legend-item">
-                  <span className="fc-dot bg-emerald" /> Cobrado
-                </span>
-                <span className="fc-legend-item">
-                  <span className="fc-dot bg-amber" /> Por Cobrar
-                </span>
-                <span className="fc-legend-item">
-                  <span className="fc-dot bg-cyan opacity-60" /> Proyección
-                </span>
+                <span className="badge badge-emerald text-xs">Invicta +148% ROI</span>
+                <span className="badge badge-indigo text-xs">Rolex +200% ROI</span>
               </div>
             </div>
 
-            <div className="fc-bar-chart-body">
-              {salesPeriods.map((period, idx) => {
-                const totalPeriodVal = period.isProjection
-                  ? period.projected
-                  : period.completed + period.pending;
-                const completedPct = (period.completed / maxBarValue) * 100;
-                const pendingPct = (period.pending / maxBarValue) * 100;
-                const projectedPct = period.isProjection
-                  ? (period.projected / maxBarValue) * 100
-                  : 0;
-                const isHovered = hoveredBarIndex === idx;
+            <div className="fc-perf-dual-grid">
+              {/* Card Invicta */}
+              <div className="fc-perf-card perf-invicta">
+                <div className="fc-perf-top">
+                  <strong className="text-white">Línea Invicta (8 Unidades)</strong>
+                  <span className="badge badge-emerald">4 / 8 Colocados</span>
+                </div>
 
-                return (
-                  <div
-                    key={period.id}
-                    className={`fc-bar-col ${isHovered ? "bar-hovered" : ""}`}
-                    onMouseEnter={() => setHoveredBarIndex(idx)}
-                    onMouseLeave={() => setHoveredBarIndex(null)}
-                  >
-                    {/* Tooltip on hover */}
-                    {isHovered && (
-                      <div className="fc-bar-tooltip">
-                        <strong>{period.label}</strong>
-                        <span className="fc-tt-range">{period.range}</span>
-                        <div className="fc-tt-val mono-num">
-                          {formatCOP(totalPeriodVal)}
-                        </div>
-                        <p className="fc-tt-desc">{period.detail}</p>
-                      </div>
-                    )}
-
-                    {/* Value label above bar */}
-                    <div className="fc-bar-val mono-num">
-                      {formatCOP(totalPeriodVal)}
-                    </div>
-
-                    {/* Bar track and fills */}
-                    <div className="fc-bar-track">
-                      {period.isProjection ? (
-                        <div
-                          className="fc-bar-fill-projection"
-                          style={{ height: `${projectedPct}%` }}
-                        />
-                      ) : (
-                        <>
-                          {period.pending > 0 && (
-                            <div
-                              className="fc-bar-fill-pending"
-                              style={{ height: `${pendingPct}%` }}
-                              title={`Pendiente: ${formatCOP(period.pending)}`}
-                            />
-                          )}
-                          {period.completed > 0 && (
-                            <div
-                              className="fc-bar-fill-completed"
-                              style={{ height: `${completedPct}%` }}
-                              title={`Cobrado: ${formatCOP(period.completed)}`}
-                            />
-                          )}
-                        </>
-                      )}
-                    </div>
-
-                    {/* Label below bar */}
-                    <div className="fc-bar-footer">
-                      <span className="fc-bar-label">{period.label}</span>
-                      <span className="fc-bar-sub">{period.range}</span>
-                    </div>
+                <div className="fc-perf-bar-wrap">
+                  <div className="flex-between text-xs text-dim">
+                    <span>Margen Bruto</span>
+                    <strong className="text-emerald mono-num">59.7% (+148% ROI)</strong>
                   </div>
-                );
-              })}
+                  <div className="fc-perf-bar-track">
+                    <div className="fc-perf-bar-fill-invicta" style={{ width: "60%" }} />
+                  </div>
+                </div>
+
+                <div className="fc-perf-metrics-list">
+                  <div className="fc-perf-metric-row">
+                    <span>Costo de Compra Lote:</span>
+                    <strong className="mono-num text-slate-300">$260.000 COP</strong>
+                  </div>
+                  <div className="fc-perf-metric-row">
+                    <span>Costo Unitario Promedio:</span>
+                    <strong className="mono-num text-slate-300">$32.500 COP / reloj</strong>
+                  </div>
+                  <div className="fc-perf-metric-row">
+                    <span>PVP Venta Promedio:</span>
+                    <strong className="mono-num text-cyan">$80.625 COP</strong>
+                  </div>
+                  <div className="fc-perf-metric-row perf-highlight">
+                    <span>Ganancia Neta / Unidad:</span>
+                    <strong className="mono-num text-emerald">+ $48.125 COP</strong>
+                  </div>
+                  <div className="fc-perf-metric-row" style={{ fontSize: "0.75rem" }}>
+                    <span>Recaudo Restante (5 relojes):</span>
+                    <strong className="mono-num text-white">$405.000 COP</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Rolex */}
+              <div className="fc-perf-card perf-rolex">
+                <div className="fc-perf-top">
+                  <strong className="text-white">Línea Rolex (6 Unidades)</strong>
+                  <span className="badge badge-indigo">2 / 6 Movidos</span>
+                </div>
+
+                <div className="fc-perf-bar-wrap">
+                  <div className="flex-between text-xs text-dim">
+                    <span>Margen Bruto</span>
+                    <strong className="text-indigo mono-num">66.7% (+200% ROI)</strong>
+                  </div>
+                  <div className="fc-perf-bar-track">
+                    <div className="fc-perf-bar-fill-rolex" style={{ width: "67%" }} />
+                  </div>
+                </div>
+
+                <div className="fc-perf-metrics-list">
+                  <div className="fc-perf-metric-row">
+                    <span>Costo de Compra Lote:</span>
+                    <strong className="mono-num text-slate-300">$200.000 COP</strong>
+                  </div>
+                  <div className="fc-perf-metric-row">
+                    <span>Costo Unitario Promedio:</span>
+                    <strong className="mono-num text-slate-300">$33.333 COP / reloj</strong>
+                  </div>
+                  <div className="fc-perf-metric-row">
+                    <span>PVP Venta Sugerido:</span>
+                    <strong className="mono-num text-indigo">$100.000 COP</strong>
+                  </div>
+                  <div className="fc-perf-metric-row perf-highlight">
+                    <span>Ganancia Neta / Unidad:</span>
+                    <strong className="mono-num text-indigo">+ $66.667 COP</strong>
+                  </div>
+                  <div className="fc-perf-metric-row" style={{ fontSize: "0.75rem" }}>
+                    <span>Recaudo Restante (4 Rolex):</span>
+                    <strong className="mono-num text-white">$400.000 COP</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Comparativa Ganancia Unitaria */}
+            <div className="fc-unit-gain-box">
+              <div className="text-center">
+                <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Ganancia Neta Invicta:</span>
+                <div className="mono-num text-emerald font-bold" style={{ fontSize: "1rem" }}>
+                  +$48.125 COP / ud
+                </div>
+              </div>
+              <div style={{ width: 1, height: 30, background: "rgba(255,255,255,0.08)" }} />
+              <div className="text-center">
+                <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Ganancia Neta Rolex:</span>
+                <div className="mono-num text-indigo font-bold" style={{ fontSize: "1rem" }}>
+                  +$66.667 COP / ud
+                </div>
+              </div>
+              <div style={{ width: 1, height: 30, background: "rgba(255,255,255,0.08)" }} />
+              <div className="text-center">
+                <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Ventaja Rolex:</span>
+                <div className="mono-num text-emerald font-bold" style={{ fontSize: "1rem" }}>
+                  +38.5% más ganancia
+                </div>
+              </div>
             </div>
 
             <div className="fc-card-subnote">
-              <Zap size={14} className="text-gold" />
+              <Sparkles size={14} className="text-emerald" />
               <span>
-                Quincena actual (16-31 Oct) superó la primera en <strong>+182%</strong> de rotación total.
+                Cada Rolex aporta <strong>+$18.542 COP más</strong> de ganancia que un Invicta con casi el mismo costo ($33.3k vs $32.5k). Es la línea más rentable para reinversión.
               </span>
             </div>
           </div>
@@ -302,9 +366,11 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
             <div className="panel-head">
               <div className="flex-row items-center gap-2">
                 <PieIcon size={18} className="text-cyan" />
-                <h4 className="panel-title">Distribución del Flujo de Capital</h4>
+                <h4 className="panel-title">Distribución del Flujo & Ganancias Krono</h4>
               </div>
-              <span className="badge badge-gold">Volumen: {formatCOP(totalFinancialVolume)}</span>
+              <span className="badge badge-emerald">
+                <Sparkles size={12} /> 53.3% Ganancia Neta Limpia
+              </span>
             </div>
 
             <div className="fc-donut-wrapper">
@@ -362,13 +428,15 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
                     {formatCOP(currentDonutFocus.amount)}
                   </span>
                   <span className="fc-center-lbl">
-                    {currentDonutFocus.id === "profit-50"
-                      ? "Utilidad Distribuible"
-                      : currentDonutFocus.id === "rolex-fund"
-                      ? "Fondo Rolex"
+                    {currentDonutFocus.id === "profit-partners"
+                      ? "Utilidad Socios (50%)"
+                      : currentDonutFocus.id === "profit-reinvest"
+                      ? "Fondo Re-inversión (50%)"
+                      : currentDonutFocus.id === "lot-cost"
+                      ? "Inversión Lotes ($460k)"
                       : currentDonutFocus.id === "supplies"
-                      ? "Insumos"
-                      : "Costo Base"}
+                      ? "Insumos Operativos"
+                      : "Ganancia Neta Limpia"}
                   </span>
                 </div>
               </div>
@@ -408,89 +476,225 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
                 })}
               </div>
             </div>
+
+            {/* Resumen Destacado de Ganancias & Recuperación */}
+            <div
+              style={{
+                marginTop: 14,
+                padding: "12px 18px",
+                borderRadius: 12,
+                background: "rgba(16, 185, 129, 0.05)",
+                border: "1px solid rgba(16, 185, 129, 0.2)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 12,
+                fontSize: "0.82rem",
+              }}
+            >
+              <div>
+                <span style={{ color: "#94a3b8" }}>💰 Ganancia Neta Limpia Total: </span>
+                <strong className="mono-num text-emerald" style={{ fontSize: "1rem" }}>
+                  +{formatCOP(netCleanProfit)}
+                </strong>
+                <span style={{ color: "#6ee7b7", fontSize: "0.75rem", marginLeft: 8 }}>
+                  (Reparto 50/50: {formatCOP(partnerProfitShare)} Elian / {formatCOP(partnerProfitShare)} Juan)
+                </span>
+              </div>
+              <div>
+                <span style={{ color: "#94a3b8" }}>📦 Inversión Combinada (14 Relojes): </span>
+                <strong className="mono-num text-indigo" style={{ fontSize: "1rem" }}>
+                  {formatCOP(totalCombinedLotCost)}
+                </strong>
+                <span style={{ color: "#a5b4fc", fontSize: "0.75rem", marginLeft: 8 }}>
+                  ($420k ya recuperados • Faltan $40k para $0 deuda)
+                </span>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* ================= PANEL 3: TERMÓMETRO / FONDO ROLEX ================= */}
+        {/* ================= PANEL 3: CONTROL DE LOTES ACTIVOS (8 INVICTA & 6 ROLEX) ================= */}
         {(activeTab === "all" || activeTab === "rolex") && (
           <div className="dash-panel fc-card fc-rolex-card">
             <div className="panel-head">
               <div className="flex-row items-center gap-2">
-                <Crown size={20} className="gold-text" />
-                <h4 className="panel-title gold-text">Fondo Rolex Alta Gama (Meta: $600.000 COP)</h4>
+                <Layers size={20} className="text-indigo" />
+                <h4 className="panel-title">Control de Lotes Activos: 8 Invictas & 6 Rolex (14 Unidades)</h4>
               </div>
-              <span className="badge badge-gold">
-                <Sparkles size={12} /> {rolexProgressPct}% Financiado
+              <span className="badge badge-emerald">
+                <Sparkles size={12} /> Ambos Lotes Pedidos & En Circulación
               </span>
             </div>
 
             <div className="fc-rolex-body">
-              {/* Progress Bar & Markers */}
-              <div className="fc-thermometer-box">
-                <div className="fc-thermo-track">
-                  <div
-                    className="fc-thermo-fill"
-                    style={{ width: `${rolexProgressPct}%` }}
-                  >
-                    <div className="fc-thermo-glow" />
+              {/* Dual Lot Status Grid */}
+              <div className="fc-lots-dual-grid">
+                {/* Card 1: Lote Invicta */}
+                <div className="fc-lot-card fc-lot-card-invicta">
+                  <div className="fc-lot-title-row">
+                    <div className="flex-row items-center gap-2">
+                      <span className="status-dot-pulse bg-emerald" />
+                      <strong className="text-white text-base">Lote Invicta (8 Unidades)</strong>
+                    </div>
+                    <span className="badge badge-emerald">
+                      4 / 8 Colocados (50%)
+                    </span>
                   </div>
 
-                  {/* Milestone Pins */}
-                  <div className="fc-pin" style={{ left: "25%" }}>
-                    <div className="fc-pin-dot" />
-                    <span className="fc-pin-lbl mono-num">$150k</span>
+                  {/* Progress bar */}
+                  <div className="fc-lot-progress-bar">
+                    <div className="fc-lot-progress-fill-invicta" style={{ width: "50%" }} />
                   </div>
-                  <div className="fc-pin" style={{ left: "50%" }}>
-                    <div className="fc-pin-dot" />
-                    <span className="fc-pin-lbl mono-num">$300k</span>
-                  </div>
-                  <div className="fc-pin" style={{ left: "75%" }}>
-                    <div className="fc-pin-dot" />
-                    <span className="fc-pin-lbl mono-num">$450k</span>
-                  </div>
-                  <div className="fc-pin" style={{ left: "100%" }}>
-                    <div className="fc-pin-dot pin-gold" />
-                    <span className="fc-pin-lbl mono-num gold-text">$600k</span>
+
+                  <div className="fc-lot-stats-list">
+                    <div className="fc-lot-stats-row">
+                      <span>3 Vendidas & Cobradas:</span>
+                      <strong className="mono-num text-emerald">+ $240.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row">
+                      <span>1 En Negociación activa:</span>
+                      <strong className="mono-num text-amber">$85.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row">
+                      <span>4 Disponibles en Stock ($80k c/u):</span>
+                      <strong className="mono-num text-cyan">$320.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row highlight-row">
+                      <span>Recaudo bruto restante (5 relojes):</span>
+                      <strong className="mono-num text-white">$405.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row" style={{ fontSize: "0.75rem" }}>
+                      <span>Faltante p/ saldar inversión:</span>
+                      <strong className="mono-num text-rose">-$20.000 COP ($0 deuda)</strong>
+                    </div>
                   </div>
                 </div>
 
-                <div className="fc-thermo-stats-strip">
-                  <div className="fcts-item">
-                    <span>Fondo Acumulado:</span>
-                    <strong className="text-cyan mono-num" style={{ fontSize: "1.2rem" }}>
-                      {formatCOP(currentRolexFund)}
-                    </strong>
+                {/* Card 2: Lote Rolex */}
+                <div className="fc-lot-card fc-lot-card-rolex">
+                  <div className="fc-lot-title-row">
+                    <div className="flex-row items-center gap-2">
+                      <span className="status-dot-pulse bg-indigo" />
+                      <strong className="text-white text-base">Lote Rolex (6 Unidades)</strong>
+                    </div>
+                    <span className="badge badge-indigo">
+                      2 / 6 Movidos (33%)
+                    </span>
                   </div>
-                  <div className="fcts-div" />
-                  <div className="fcts-item">
-                    <span>Faltante para Compra:</span>
-                    <strong className="text-gold mono-num" style={{ fontSize: "1.2rem" }}>
-                      {formatCOP(remainingForRolex)}
-                    </strong>
+
+                  {/* Progress bar */}
+                  <div className="fc-lot-progress-bar">
+                    <div className="fc-lot-progress-fill-rolex" style={{ width: "33%" }} />
                   </div>
-                  <div className="fcts-div" />
-                  <div className="fcts-item">
-                    <span>Rotación Estimada:</span>
-                    <strong className="text-emerald mono-num" style={{ fontSize: "1.2rem" }}>
-                      {watchesNeeded > 0 ? `~${watchesNeeded} Relojes Invicta` : "¡Meta Alcanzada!"}
-                    </strong>
+
+                  <div className="fc-lot-stats-list">
+                    <div className="fc-lot-stats-row">
+                      <span>2 Relojes Entregados:</span>
+                      <strong className="mono-num text-indigo">En proceso recaudo</strong>
+                    </div>
+                    <div className="fc-lot-stats-row">
+                      <span>4 Disponibles en Stock:</span>
+                      <strong className="mono-num text-indigo">$400.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row">
+                      <span>Precio Sugerido Pro:</span>
+                      <strong className="mono-num text-slate-300">$100.000 COP c/u</strong>
+                    </div>
+                    <div className="fc-lot-stats-row highlight-row">
+                      <span>Recaudo bruto restante (4 Rolex):</span>
+                      <strong className="mono-num text-white">$400.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row" style={{ fontSize: "0.75rem" }}>
+                      <span>Faltante p/ saldar inversión:</span>
+                      <strong className="mono-num text-rose">-$20.000 COP ($0 deuda)</strong>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Scaling Insights banner */}
-              <div className="fc-rolex-insight-card">
-                <div className="ric-icon">
-                  <Target size={22} className="text-cyan" />
+              {/* Strip Consolidado de Liquidación Total */}
+              <div className="fc-thermo-stats-strip">
+                <div className="fcts-item">
+                  <span>Ingreso Bruto por Entrar (9 Relojes):</span>
+                  <strong className="text-white mono-num" style={{ fontSize: "1.25rem" }}>
+                    $805.000
+                  </strong>
+                  <small style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>
+                    1 Invicta @85k + 4 Invicta @80k + 4 Rolex @100k
+                  </small>
                 </div>
-                <div className="ric-text">
-                  <h5 className="ric-title">Plan de Escalamiento Auto-sostenible:</h5>
-                  <p className="ric-desc">
-                    Cada venta de Invicta aporta el <strong>50% de ganancia bruta</strong> al Fondo Rolex.
-                    Con los <strong>4 relojes restantes del lote actual</strong>, el fondo superará los{" "}
-                    <strong className="text-gold">$120.000 COP</strong>, dejando a Krono listo para adquirir la primera
-                    unidad Rolex Submariner o Daytona sin requerir inyección de capital de los socios.
-                  </p>
+                <div className="fcts-div" />
+                <div className="fcts-item">
+                  <span>Saldar Inversiones ($0 Deuda):</span>
+                  <strong className="text-rose mono-num" style={{ fontSize: "1.25rem" }}>
+                    -$40.000
+                  </strong>
+                  <small style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>
+                    -$20k Invictas | -$20k Rolex
+                  </small>
+                </div>
+                <div className="fcts-div" />
+                <div className="fcts-item">
+                  <span>Ganancia Neta Limpia Total:</span>
+                  <strong className="text-emerald mono-num" style={{ fontSize: "1.25rem" }}>
+                    $765.000
+                  </strong>
+                  <small style={{ fontSize: "0.72rem", color: "var(--emerald-light)" }}>
+                    Reparto 50/50: $382.500 c/u
+                  </small>
+                </div>
+              </div>
+
+              {/* Liquidación Individual de Socios Fundadores */}
+              <div className="fc-rolex-insight-card" style={{ background: "rgba(99, 102, 241, 0.05)", borderColor: "rgba(99, 102, 241, 0.2)" }}>
+                <div className="ric-icon">
+                  <ShieldCheck size={26} className="text-indigo" />
+                </div>
+                <div className="ric-text" style={{ width: "100%" }}>
+                  <div className="flex-between items-center" style={{ marginBottom: "8px" }}>
+                    <h5 className="ric-title text-indigo" style={{ margin: 0 }}>
+                      Liquidación de Cierre por Socio Fundador (50/50):
+                    </h5>
+                    <span className="badge badge-indigo">Cuentas Claras</span>
+                  </div>
+
+                  <div className="fc-partner-payout-grid">
+                    {/* Elian */}
+                    <div className="fc-partner-payout-box elian-payout">
+                      <div className="flex-between items-center mb-1">
+                        <strong className="text-emerald">Elian Navarro</strong>
+                        <span className="badge badge-emerald" style={{ fontSize: "0.7rem", padding: "2px 6px" }}>Cofundador</span>
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "2px" }}>
+                        <div>+ $382.500 (Ganancia base 50%)</div>
+                        <div>+ $60.000 (Recuperación anticipo Rolex)</div>
+                        <div>+ $37.000 (Cobro deuda pendiente de Juan)</div>
+                      </div>
+                      <div className="flex-between items-center pt-2 mt-1 border-t border-white/10">
+                        <span style={{ fontSize: "0.8rem", color: "#fff" }}>Liquidación final:</span>
+                        <strong className="mono-num text-white text-base">$479.500 COP</strong>
+                      </div>
+                    </div>
+
+                    {/* Juan */}
+                    <div className="fc-partner-payout-box juan-payout">
+                      <div className="flex-between items-center mb-1">
+                        <strong className="text-indigo">Juan</strong>
+                        <span className="badge badge-indigo" style={{ fontSize: "0.7rem", padding: "2px 6px" }}>Cofundador</span>
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "2px" }}>
+                        <div>+ $382.500 (Ganancia base 50%)</div>
+                        <div>- $37.000 (Descuento de su deuda con Elian)</div>
+                        <div style={{ visibility: "hidden" }}>-</div>
+                      </div>
+                      <div className="flex-between items-center pt-2 mt-1 border-t border-white/10">
+                        <span style={{ fontSize: "0.8rem", color: "#fff" }}>Liquidación final:</span>
+                        <strong className="mono-num text-white text-base">$345.500 COP</strong>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { CheckCircle2, AlertTriangle, Coins, PlusCircle, Trash2 } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Coins, PlusCircle, Trash2, Crown, Sparkles } from "lucide-react";
+import { FounderMindsetBar } from "../components/FounderMindsetBar";
 
 export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agreements, onToggleAgreement, onAddAgreement, isEditMode }) {
   const [showNewAgrForm, setShowNewAgrForm] = useState(false);
@@ -17,7 +18,7 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
     <div className="page-layout">
       {/* Society header */}
       <div className="society-banner dash-panel">
-        <div className="sb-metric"><span className="sbm-label">Sociedad</span><strong className="sbm-val gold-text">KRONO Timepieces 50/50</strong></div>
+        <div className="sb-metric"><span className="sbm-label">Sociedad</span><strong className="sbm-val text-indigo font-bold">KRONO Timepieces • Sociedad Fundadora 50/50</strong></div>
         <div className="sb-divv" />
         <div className="sb-metric"><span className="sbm-label">Capital Total Inyectado</span><strong className="sbm-val mono-num text-emerald">{formatCOP(fin.totalCapitalInjected)}</strong></div>
         <div className="sb-divv" />
@@ -27,6 +28,8 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
         )}
       </div>
 
+      <FounderMindsetBar />
+
       {/* Two partner cards */}
       <div className="partners-grid">
         {/* ELIAN */}
@@ -34,7 +37,7 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
           <div className="pc-header">
             <div className="pc-avatar" style={{ background: "rgba(16,185,129,0.2)", color: "#10b981" }}>EN</div>
             <div>
-              <div className="pc-badge-row"><span className="badge badge-emerald">Socio 1 • 50%</span></div>
+              <div className="pc-badge-row"><span className="badge badge-emerald">Cofundador • 50%</span></div>
               <h3 className="pc-name">Elian Navarro</h3>
               <p className="pc-role">Finanzas, Administración & Herramientas</p>
             </div>
@@ -47,7 +50,12 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
             <div className="pcm-box"><span className="pcm-label">Aporte Acordado</span><strong className="pcm-val mono-num">{formatCOP(fin.agreedPerPartner)}</strong><span className="pcm-sub text-emerald">100% cubierto</span></div>
             <div className="pcm-box"><span className="pcm-label">Insumos Propios</span><strong className="pcm-val mono-num">{formatCOP(fin.elianSupplies)}</strong><span className="pcm-sub">Herramientas + Tarjetas</span></div>
             <div className="pcm-box highlight-emerald"><span className="pcm-label">Capital Total</span><strong className="pcm-val mono-num text-emerald">{formatCOP(fin.totalCapitalElian)}</strong></div>
-            <div className="pcm-box highlight-emerald"><span className="pcm-label">Deuda Juan por cobrar</span><strong className="pcm-val mono-num text-emerald">{formatCOP(fin.juanRemainingDebt)}</strong></div>
+            <div className="pcm-box highlight-emerald"><span className="pcm-label">Deuda Juan por cobrar</span><strong className="pcm-val mono-num text-emerald">{formatCOP(fin.juanRemainingDebt || 37000)}</strong></div>
+            <div className="pcm-box highlight-indigo" style={{ gridColumn: "span 2" }}>
+              <span className="pcm-label">👑 Retiro Capital Rolex (Elian)</span>
+              <strong className="pcm-val mono-num text-indigo">{formatCOP(fin.elianRolexAdvance || 60000)}</strong>
+              <span className="pcm-sub">Puesto por Elian para los Rolex, a reembolsar</span>
+            </div>
           </div>
 
           <div className="pc-roles">
@@ -62,11 +70,11 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
         </div>
 
         {/* JUAN */}
-        <div className="partner-card" style={{ "--pc-color": "#e5b869" }}>
+        <div className="partner-card" style={{ "--pc-color": "#818cf8" }}>
           <div className="pc-header">
-            <div className="pc-avatar" style={{ background: "rgba(229,184,105,0.2)", color: "#e5b869" }}>JS</div>
+            <div className="pc-avatar" style={{ background: "rgba(129,140,248,0.2)", color: "#818cf8" }}>JS</div>
             <div>
-              <div className="pc-badge-row"><span className="badge badge-gold">Socio 2 • 50%</span></div>
+              <div className="pc-badge-row"><span className="badge badge-indigo">Cofundador • 50%</span></div>
               <h3 className="pc-name">Juan</h3>
               <p className="pc-role">Ventas Comerciales, Empaque & Logística</p>
             </div>
@@ -76,11 +84,11 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
           </div>
 
           <div className="pc-metrics-grid">
-            <div className="pcm-box"><span className="pcm-label">Aporte Entregado</span><strong className="pcm-val mono-num">{formatCOP(fin.juanLotPaid)}</strong><span className="pcm-sub">$80k inicial + $10k abono</span></div>
+            <div className="pcm-box"><span className="pcm-label">Aporte Entregado</span><strong className="pcm-val mono-num">{formatCOP(fin.juanLotPaid)}</strong><span className="pcm-sub">$80k inicial + $13k abonos</span></div>
             <div className="pcm-box"><span className="pcm-label">Insumos Propios</span><strong className="pcm-val mono-num">{formatCOP(fin.juanSupplies)}</strong><span className="pcm-sub">Bolsas + Microfibras</span></div>
-            <div className="pcm-box highlight-gold"><span className="pcm-label">Capital Total</span><strong className="pcm-val mono-num text-gold">{formatCOP(fin.totalCapitalJuan)}</strong></div>
+            <div className="pcm-box highlight-indigo"><span className="pcm-label">Capital Total</span><strong className="pcm-val mono-num text-indigo">{formatCOP(fin.totalCapitalJuan)}</strong></div>
             <div className={`pcm-box ${fin.juanRemainingDebt > 0 ? "highlight-rose" : "highlight-emerald"}`}>
-              <span className="pcm-label">Deuda a saldar</span>
+              <span className="pcm-label">Deuda a saldar con Elian</span>
               <strong className={`pcm-val mono-num ${fin.juanRemainingDebt > 0 ? "text-rose" : "text-emerald"}`}>{formatCOP(fin.juanRemainingDebt)}</strong>
             </div>
           </div>
@@ -88,10 +96,10 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
           <div className="pc-debt-progress">
             <div className="pdp-labels">
               <span>Progreso pago del lote</span>
-              <span className="mono-num text-gold">{formatCOP(fin.juanLotPaid)} / {formatCOP(fin.agreedPerPartner)} ({fin.juanDebtProgress}%)</span>
+              <span className="mono-num text-indigo">{formatCOP(fin.juanLotPaid)} / {formatCOP(fin.agreedPerPartner)} ({fin.juanDebtProgress}%)</span>
             </div>
             <div className="progress-track">
-              <div className="progress-fill-gold" style={{ width: `${fin.juanDebtProgress}%` }} />
+              <div className="progress-fill-indigo" style={{ width: `${fin.juanDebtProgress}%` }} />
             </div>
             {fin.juanRemainingDebt > 0 && (
               <button className="btn-sm btn-emerald mt-1" onClick={onOpenDebtModal}><Coins size={14}/> Registrar abono</button>
@@ -106,6 +114,54 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
               <li>Paños de microfibra para pulido y presentación</li>
               <li>Captación directa de clientes y redes de contacto</li>
             </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Resumen Oficial de Liquidación de Inventario Restante */}
+      <div className="dash-panel" style={{ border: "1px solid rgba(129,140,248,0.25)" }}>
+        <div className="panel-head">
+          <div>
+            <h3 className="panel-title text-indigo font-bold">Liquidación Proyectada: Cierre de Inventario Restante</h3>
+            <p className="panel-subtitle" style={{ margin: "4px 0 0 0", fontSize: "0.8rem", color: "var(--text-dim)" }}>
+              5 Invictas y 4 Rolex por vender con descuento de $40.000 para quedar en $0 deuda y cuentas de socios.
+            </p>
+          </div>
+          <span className="badge badge-indigo">Balance Oficial Krono</span>
+        </div>
+
+        <div className="summary-table" style={{ marginTop: 12 }}>
+          <div className="st-row">
+            <span className="st-label">1. Ingresos Brutos por Entrar (1 Invicta neg $85k + 4 Invictas $320k + 4 Rolex $400k)</span>
+            <span className="st-val mono-num text-emerald">+{formatCOP(fin.totalGrossRemainingRevenue || 805000)}</span>
+          </div>
+          <div className="st-row">
+            <span className="st-label">2. Descuento Inversión Pendiente ($20k Invicta + $20k Rolex para $0 Deuda)</span>
+            <span className="st-val mono-num text-rose">-{formatCOP(fin.totalPendingInvestmentRecovery || 40000)}</span>
+          </div>
+          <div className="st-row st-row-bold">
+            <span className="st-label">3. Ganancia Neta Limpia Total</span>
+            <span className="st-val mono-num text-emerald font-bold">+{formatCOP(fin.netCleanProfitRemaining || 765000)}</span>
+          </div>
+          <div className="st-row">
+            <span className="st-label">4. Reparto 50 / 50 Base</span>
+            <span className="st-val mono-num text-main">{formatCOP(fin.netCleanProfit50Each || 382500)} c/u</span>
+          </div>
+          <div className="st-row">
+            <span className="st-label">👑 Ajuste Elian: Retiro de Capital propio Rolex puesto por Elian</span>
+            <span className="st-val mono-num text-indigo">+{formatCOP(fin.elianRolexAdvance || 60000)}</span>
+          </div>
+          <div className="st-row">
+            <span className="st-label">🤝 Ajuste Juan: Pago de Deuda pendiente de Juan a Elian</span>
+            <span className="st-val mono-num text-rose">-{formatCOP(fin.juanRemainingDebt || 37000)}</span>
+          </div>
+          <div className="st-row st-row-bold" style={{ background: "rgba(16,185,129,0.08)" }}>
+            <span className="st-label text-emerald">💰 Pago Final Neto a Recibir: ELIAN NAVARRO</span>
+            <span className="st-val mono-num text-emerald" style={{ fontSize: "1.05rem" }}>{formatCOP(fin.elianFinalProjectedPayout || 479500)}</span>
+          </div>
+          <div className="st-row st-row-bold" style={{ background: "rgba(129,140,248,0.08)" }}>
+            <span className="st-label text-indigo">💰 Pago Final Neto a Recibir: JUAN</span>
+            <span className="st-val mono-num text-indigo" style={{ fontSize: "1.05rem" }}>{formatCOP(fin.juanFinalProjectedPayout || 345500)}</span>
           </div>
         </div>
       </div>
@@ -145,7 +201,7 @@ export function PartnersPage({ financials: fin, formatCOP, onOpenDebtModal, agre
                 <h4 className="agr-title">{agr.title}</h4>
                 <p className="agr-desc">{agr.description}</p>
               </div>
-              <span className="badge badge-gold">{agr.category}</span>
+              <span className="badge badge-indigo">{agr.category}</span>
             </div>
           ))}
         </div>

@@ -27,31 +27,29 @@ export function App() {
   // EDIT MODE
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // DATA STATE
+  // DATA STATE (v5 schema with combined lots $460.000, 53.3% net profits & partner accounts)
   const [transactions, setTransactions] = useState(() => {
-    const saved = localStorage.getItem("krono_transactions");
+    const saved = localStorage.getItem("krono_transactions_v5");
     return saved ? JSON.parse(saved) : INITIAL_DATA.transactions;
   });
   const [inventory, setInventory] = useState(() => {
-    const saved = localStorage.getItem("krono_inventory_v3");
+    const saved = localStorage.getItem("krono_inventory_v5");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const existingIds = new Set(parsed.map((w) => w.id));
-          const newFromCode = INITIAL_DATA.inventory.filter((w) => !existingIds.has(w.id));
-          return newFromCode.length > 0 ? [...parsed, ...newFromCode] : parsed;
+          return parsed;
         }
       } catch (e) {}
     }
     return INITIAL_DATA.inventory;
   });
   const [agreements, setAgreements] = useState(() => {
-    const saved = localStorage.getItem("krono_agreements");
+    const saved = localStorage.getItem("krono_agreements_v5");
     return saved ? JSON.parse(saved) : INITIAL_DATA.agreements;
   });
   const [lotConfig, setLotConfig] = useState(() => {
-    const saved = localStorage.getItem("krono_lot_config");
+    const saved = localStorage.getItem("krono_lot_config_v5");
     return saved ? JSON.parse(saved) : INITIAL_DATA.lotConfig;
   });
 
@@ -66,10 +64,10 @@ export function App() {
   const [cloudStatus, setCloudStatus] = useState("syncing"); // 'synced' | 'syncing' | 'offline'
 
   // Persist all data locally (offline fallback)
-  useEffect(() => { localStorage.setItem("krono_transactions", JSON.stringify(transactions)); }, [transactions]);
-  useEffect(() => { localStorage.setItem("krono_inventory_v3", JSON.stringify(inventory)); }, [inventory]);
-  useEffect(() => { localStorage.setItem("krono_agreements", JSON.stringify(agreements)); }, [agreements]);
-  useEffect(() => { localStorage.setItem("krono_lot_config", JSON.stringify(lotConfig)); }, [lotConfig]);
+  useEffect(() => { localStorage.setItem("krono_transactions_v5", JSON.stringify(transactions)); }, [transactions]);
+  useEffect(() => { localStorage.setItem("krono_inventory_v5", JSON.stringify(inventory)); }, [inventory]);
+  useEffect(() => { localStorage.setItem("krono_agreements_v5", JSON.stringify(agreements)); }, [agreements]);
+  useEffect(() => { localStorage.setItem("krono_lot_config_v5", JSON.stringify(lotConfig)); }, [lotConfig]);
   useEffect(() => {
     if (activeUser) localStorage.setItem("krono_active_user", JSON.stringify(activeUser));
     else localStorage.removeItem("krono_active_user");
@@ -84,15 +82,25 @@ export function App() {
       const cloudStore = await fetchKronoStore();
       if (!isMounted) return;
 
-      if (cloudStore) {
+      if (cloudStore && cloudStore.schemaVersion === "v5") {
         if (Array.isArray(cloudStore.transactions)) setTransactions(cloudStore.transactions);
         if (Array.isArray(cloudStore.inventory)) setInventory(cloudStore.inventory);
         if (Array.isArray(cloudStore.agreements)) setAgreements(cloudStore.agreements);
         if (cloudStore.lotConfig) setLotConfig(cloudStore.lotConfig);
         setCloudStatus("synced");
       } else {
-        // Initialize remote database on first run
-        const initialStore = { transactions, inventory, agreements, lotConfig };
+        // Initialize or upgrade remote database to v5 schema
+        const initialStore = { 
+          schemaVersion: "v5",
+          transactions: INITIAL_DATA.transactions, 
+          inventory: INITIAL_DATA.inventory, 
+          agreements: INITIAL_DATA.agreements, 
+          lotConfig: INITIAL_DATA.lotConfig 
+        };
+        setTransactions(initialStore.transactions);
+        setInventory(initialStore.inventory);
+        setAgreements(initialStore.agreements);
+        setLotConfig(initialStore.lotConfig);
         const ok = await saveKronoStore(initialStore);
         if (isMounted) setCloudStatus(ok ? "synced" : "offline");
       }
@@ -127,7 +135,7 @@ export function App() {
 
     setCloudStatus("syncing");
     const timer = setTimeout(async () => {
-      const ok = await saveKronoStore({ transactions, inventory, agreements, lotConfig });
+      const ok = await saveKronoStore({ schemaVersion: "v5", transactions, inventory, agreements, lotConfig });
       setCloudStatus(ok ? "synced" : "offline");
     }, 600);
 
@@ -137,7 +145,7 @@ export function App() {
   const handleForceCloudSync = async () => {
     setCloudStatus("syncing");
     showToast("🔄 Sincronizando con Supabase...");
-    const ok = await saveKronoStore({ transactions, inventory, agreements, lotConfig });
+    const ok = await saveKronoStore({ schemaVersion: "v5", transactions, inventory, agreements, lotConfig });
     setCloudStatus(ok ? "synced" : "offline");
     if (ok) showToast("✅ Sincronizado correctamente con Supabase.");
     else showToast("⚠️ Error de conexión con Supabase. Revisa la tabla krono_store.", "info");
@@ -220,13 +228,33 @@ export function App() {
   };
 
   const handleResetData = () => {
-    if (window.confirm("¿Restaurar todos los datos al estado original del Excel?")) {
-      ["krono_transactions","krono_inventory_v3","krono_agreements","krono_lot_config"].forEach(k => localStorage.removeItem(k));
+    if (window.confirm("¿Restaurar todos los datos al balance oficial actualizado (5 Invictas, 4 Rolex, Juan debe $37k)?")) {
+      [
+        "krono_transactions",
+        "krono_transactions_v4",
+        "krono_transactions_v5",
+        "krono_inventory_v3",
+        "krono_inventory_v4",
+        "krono_inventory_v5",
+        "krono_agreements",
+        "krono_agreements_v4",
+        "krono_agreements_v5",
+        "krono_lot_config",
+        "krono_lot_config_v4",
+        "krono_lot_config_v5"
+      ].forEach(k => localStorage.removeItem(k));
       setTransactions(INITIAL_DATA.transactions);
       setInventory(INITIAL_DATA.inventory);
       setAgreements(INITIAL_DATA.agreements);
       setLotConfig(INITIAL_DATA.lotConfig);
-      showToast("♻️ Datos restaurados al Excel original.");
+      saveKronoStore({ 
+        schemaVersion: "v5",
+        transactions: INITIAL_DATA.transactions, 
+        inventory: INITIAL_DATA.inventory, 
+        agreements: INITIAL_DATA.agreements, 
+        lotConfig: INITIAL_DATA.lotConfig 
+      });
+      showToast("✅ Datos restaurados al balance oficial actualizado de Krono.");
     }
   };
 

@@ -15,16 +15,156 @@ import {
   X,
   PlusCircle,
   Trash2,
+  Crown,
+  Zap,
+  ArrowRight,
+  ShieldCheck,
+  Wallet,
 } from "lucide-react";
+import { KronoVision50 } from "../components/KronoVision50";
+
+// Precision Slider Component with Live Floating Price Bubble & Glowing Fill
+function PrecisionSlider({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step = 1000,
+  format = (v) => v,
+  color = "gold",
+  ticks = [],
+  suffix = "",
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(String(value));
+
+  // Compute thumb position percentage (0% to 100%)
+  const percent = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+
+  const handleStep = (delta) => {
+    const next = Math.min(max, Math.max(min, value + delta));
+    onChange(next);
+  };
+
+  const handleInputSubmit = () => {
+    let num = Number(inputValue.replace(/[^0-9]/g, ""));
+    if (isNaN(num) || num === 0) num = value;
+    num = Math.min(max, Math.max(min, num));
+    onChange(num);
+    setIsEditing(false);
+  };
+
+  const colorHex = color === "emerald" ? "#10b981" : color === "cyan" ? "#06b6d4" : "#e5b869";
+
+  return (
+    <div className={`precision-slider-group color-${color}`}>
+      <div className="control-header">
+        <label>{label}</label>
+        <div className="psg-header-controls">
+          <button
+            type="button"
+            className="psg-step-btn"
+            onClick={() => handleStep(-step)}
+            title="Reducir"
+          >
+            -
+          </button>
+
+          {isEditing ? (
+            <input
+              type="text"
+              className="psg-manual-input mono-num"
+              value={inputValue}
+              autoFocus
+              onChange={(e) => setInputValue(e.target.value)}
+              onBlur={handleInputSubmit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleInputSubmit();
+                if (e.key === "Escape") setIsEditing(false);
+              }}
+            />
+          ) : (
+            <span
+              className="mono-num font-bold psg-clickable-val"
+              style={{ color: colorHex }}
+              onClick={() => {
+                setInputValue(String(value));
+                setIsEditing(true);
+              }}
+              title="Haz clic para escribir el precio exacto"
+            >
+              {format(value)}{suffix}
+              <Edit2 size={11} className="psg-edit-icon" />
+            </span>
+          )}
+
+          <button
+            type="button"
+            className="psg-step-btn"
+            onClick={() => handleStep(step)}
+            title="Aumentar"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      {/* Slider Track with Live Floating Price Tooltip */}
+      <div className="psg-slider-track-wrap">
+        {/* Floating Tooltip Bubble directly above the Thumb */}
+        <div
+          className="psg-floating-bubble"
+          style={{
+            left: `calc(${percent}% + (${10 - percent * 0.2}px))`,
+            borderColor: colorHex,
+            boxShadow: `0 4px 14px ${colorHex}50`,
+          }}
+        >
+          <span className="psg-bubble-text mono-num">{format(value)}{suffix}</span>
+          <div className="psg-bubble-arrow" style={{ borderTopColor: colorHex }} />
+        </div>
+
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="sim-slider-v2"
+          style={{
+            background: `linear-gradient(to right, ${colorHex} 0%, ${colorHex} ${percent}%, rgba(255, 255, 255, 0.12) ${percent}%, rgba(255, 255, 255, 0.12) 100%)`,
+          }}
+        />
+      </div>
+
+      {ticks && ticks.length > 0 && (
+        <div className="slider-ticks">
+          {ticks.map((t, idx) => (
+            <span
+              key={idx}
+              className="tick-label-clickable"
+              onClick={() => onChange(t.val)}
+              title={`Fijar a ${t.label}`}
+            >
+              {t.label}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onUpdateLotConfig }) {
   const fin = financials;
 
   // Simulator State
   const [simUnits, setSimUnits] = useState(lotConfig?.targetUnits || 10);
-  const [simBuyPrice, setSimBuyPrice] = useState(lotConfig?.targetCostPerUnit || 45000);
-  const [simSellPrice, setSimSellPrice] = useState(lotConfig?.targetSellPerUnit || 90000);
-  const [simSupplies, setSimSupplies] = useState(lotConfig?.suppliesBudget || 60000);
+  const [simBuyPrice, setSimBuyPrice] = useState(lotConfig?.targetCostPerUnit || 35000);
+  const [simSellPrice, setSimSellPrice] = useState(lotConfig?.targetSellPerUnit || 100000);
+  const [simSupplies, setSimSupplies] = useState(lotConfig?.suppliesBudget || 40000);
 
   // Calculations
   const simTotalCost = simUnits * simBuyPrice + Number(simSupplies);
@@ -40,6 +180,45 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
   const currentFund = fin.reinvestmentFund50;
   const fundProgress = Math.min(100, Math.round((currentFund / rolexGoal) * 100));
 
+  // Quick Simulation Presets
+  const PRESETS = [
+    {
+      name: "👑 4 Rolex Actuales ($100k PVP)",
+      units: 4,
+      buyPrice: 35000,
+      sellPrice: 100000,
+      supplies: 20000,
+    },
+    {
+      name: "⚡ 4 Invicta Actuales ($80k PVP)",
+      units: 4,
+      buyPrice: 30000,
+      sellPrice: 80000,
+      supplies: 20000,
+    },
+    {
+      name: "🚀 Lote Escalamiento (10 unids)",
+      units: 10,
+      buyPrice: 40000,
+      sellPrice: 100000,
+      supplies: 40000,
+    },
+    {
+      name: "🌟 Lote Alto Volumen (20 unids)",
+      units: 20,
+      buyPrice: 35000,
+      sellPrice: 95000,
+      supplies: 60000,
+    },
+  ];
+
+  const applyPreset = (p) => {
+    setSimUnits(p.units);
+    setSimBuyPrice(p.buyPrice);
+    setSimSellPrice(p.sellPrice);
+    setSimSupplies(p.supplies);
+  };
+
   // Custom milestones
   const [milestones, setMilestones] = useState([
     {
@@ -47,8 +226,8 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
       dateBadge: "30 de Octubre (Hoy)",
       badgeColor: "amber",
       tag: "Quincena Actual",
-      title: "Cobro 4ª Venta Amiga & Cierre Mensual",
-      desc: "Cobro de los $85.000 pactados. Cierre de balance y abono de deuda de Juan a Elian.",
+      title: "Cobro Invicta en Negociación ($85.000)",
+      desc: "Cobro del reloj en negociación pactada. Cierre de balance e ingreso a caja de Krono.",
       active: true,
     },
     {
@@ -56,8 +235,8 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
       dateBadge: "15 de Noviembre",
       badgeColor: "cyan",
       tag: "Quincena #1 Nov",
-      title: "Campaña Liquidación Relojes Venom & Bolt Zeus",
-      desc: "Promocionar en WhatsApp y catálogo los 4 relojes disponibles en inventario con fotos de alta calidad.",
+      title: "Venta Lote Invicta & Rolex en Rotación",
+      desc: "Rotación activa de los 4 Invictas restantes ($80k c/u) y los 4 Rolex restantes ($100k c/u).",
       active: false,
     },
     {
@@ -65,8 +244,8 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
       dateBadge: "30 de Noviembre",
       badgeColor: "cyan",
       tag: "Black Friday",
-      title: "Adquisición Lote Navideño Rolex / Invicta Master",
-      desc: "Unificar el fondo de reinversión para hacer el pedido mayorista antes del alza de temporada decembrina.",
+      title: "Liquidación a $0 Deuda & Adquisición Mayorista",
+      desc: "Recuperar los $40.000 faltantes de inversión y unificar el fondo para el pedido navideño.",
       active: false,
     },
     {
@@ -150,7 +329,10 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
         </div>
       </div>
 
-      {/* Simulator Section */}
+      {/* Horizonte KRONO 50: Punto de Cosecha & Sueldo Mensual Limpio */}
+      <KronoVision50 formatCOP={formatCOP} currentWatches={14} />
+
+      {/* Simulator Section with Precision Sliders and Real-time Floating Price Indicator */}
       <div className="glass-panel simulator-panel">
         <div className="panel-header">
           <div>
@@ -159,80 +341,88 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
               <h3 className="panel-title">Simulador de Próximo Lote de Relojes</h3>
             </div>
             <p className="panel-subtitle">
-              Calcula con tu socio el capital necesario, la ganancia estimada y el reparto 50/50
+              Calcula con tu socio el capital necesario, la ganancia estimada y el reparto 50/50.
+              Mueve la barra o escribe el precio exacto en cualquier momento.
             </p>
           </div>
           <span className="badge badge-emerald">Tiempo Real</span>
         </div>
 
+        {/* Quick presets buttons */}
+        <div className="sim-presets-bar">
+          <span className="sim-presets-label">Plantillas Rápidas:</span>
+          {PRESETS.map((p, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className="sim-preset-btn"
+              onClick={() => applyPreset(p)}
+            >
+              {p.name}
+            </button>
+          ))}
+        </div>
+
         <div className="sim-layout">
-          {/* Controls Column */}
+          {/* Controls Column with Dynamic Sliders */}
           <div className="sim-controls">
-            <div className="control-group">
-              <div className="control-header">
-                <label>Cantidad de Relojes a Comprar:</label>
-                <span className="mono-num font-bold text-gold-light">{simUnits} piezas</span>
-              </div>
-              <input
-                type="range"
-                min="4"
-                max="30"
-                step="1"
-                value={simUnits}
-                onChange={(e) => setSimUnits(Number(e.target.value))}
-                className="sim-slider"
-              />
-              <div className="slider-ticks">
-                <span>4 unids</span>
-                <span>10 unids</span>
-                <span>20 unids</span>
-                <span>30 unids</span>
-              </div>
-            </div>
+            {/* Cantidad de Relojes */}
+            <PrecisionSlider
+              label="Cantidad de Relojes a Comprar:"
+              value={simUnits}
+              onChange={setSimUnits}
+              min={1}
+              max={40}
+              step={1}
+              format={(v) => v}
+              suffix=" piezas"
+              color="gold"
+              ticks={[
+                { label: "4 unids", val: 4 },
+                { label: "10 unids", val: 10 },
+                { label: "20 unids", val: 20 },
+                { label: "30 unids", val: 30 },
+                { label: "40 unids", val: 40 },
+              ]}
+            />
 
-            <div className="control-group">
-              <div className="control-header">
-                <label>Costo de Compra por Unidad:</label>
-                <span className="mono-num font-bold text-emerald-light">{formatCOP(simBuyPrice)}</span>
-              </div>
-              <input
-                type="range"
-                min="25000"
-                max="150000"
-                step="5000"
-                value={simBuyPrice}
-                onChange={(e) => setSimBuyPrice(Number(e.target.value))}
-                className="sim-slider"
-              />
-              <div className="slider-ticks">
-                <span>$25k (Básico)</span>
-                <span>$60k (Pro)</span>
-                <span>$150k (Rolex Edition)</span>
-              </div>
-            </div>
+            {/* Costo de Compra por Unidad */}
+            <PrecisionSlider
+              label="Costo de Compra por Unidad:"
+              value={simBuyPrice}
+              onChange={setSimBuyPrice}
+              min={15000}
+              max={150000}
+              step={1000}
+              format={formatCOP}
+              color="emerald"
+              ticks={[
+                { label: "$25k", val: 25000 },
+                { label: "$35k (Rolex Actual)", val: 35000 },
+                { label: "$60k (Pro)", val: 60000 },
+                { label: "$100k", val: 100000 },
+              ]}
+            />
 
-            <div className="control-group">
-              <div className="control-header">
-                <label>Precio de Venta al Público (PVP):</label>
-                <span className="mono-num font-bold text-gold-light">{formatCOP(simSellPrice)}</span>
-              </div>
-              <input
-                type="range"
-                min="50000"
-                max="300000"
-                step="5000"
-                value={simSellPrice}
-                onChange={(e) => setSimSellPrice(Number(e.target.value))}
-                className="sim-slider"
-              />
-              <div className="slider-ticks">
-                <span>$50k</span>
-                <span>$90k (Actual)</span>
-                <span>$180k (Rolex)</span>
-                <span>$300k</span>
-              </div>
-            </div>
+            {/* Precio de Venta al Público (PVP) */}
+            <PrecisionSlider
+              label="Precio de Venta al Público (PVP):"
+              value={simSellPrice}
+              onChange={setSimSellPrice}
+              min={30000}
+              max={250000}
+              step={1000}
+              format={formatCOP}
+              color="gold"
+              ticks={[
+                { label: "$50k", val: 50000 },
+                { label: "$80k (Invicta Actual)", val: 80000 },
+                { label: "$100k (Rolex Actual)", val: 100000 },
+                { label: "$150k", val: 150000 },
+              ]}
+            />
 
+            {/* Presupuesto Insumos */}
             <div className="control-group">
               <label>Presupuesto Empaques & Almohadillas (COP):</label>
               <input
@@ -293,6 +483,152 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
                 <span className="dp-val mono-num text-gold-light">{formatCOP(simPerPartner)}</span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* PROYECCIÓN OFICIAL DEL INVENTARIO RESTANTE (KRONO TIMEPIECES - BALANCE ACTUALIZADO) */}
+      <div className="krono-actual-projection-panel">
+        <div className="kap-header">
+          <div>
+            <div className="kap-title-row">
+              <ShieldCheck size={24} className="text-emerald" />
+              <h3 className="panel-title gold-text">
+                Proyección Oficial de Cierre: Inventario Restante KRONO
+              </h3>
+            </div>
+            <p className="panel-subtitle">
+              Balance consolidado en tiempo real con 5 Invictas y 4 Rolex por vender, liquidación $0 deuda y cuentas entre socios.
+            </p>
+          </div>
+          <span className="badge badge-emerald">Krono 50/50</span>
+        </div>
+
+        <div className="kap-grid">
+          {/* 1. Ingresos por Entrar */}
+          <div className="kap-card">
+            <div>
+              <div className="kap-card-title text-emerald">
+                <Wallet size={16} /> 1. Ingresos Brutos por Entrar
+              </div>
+              <ul className="kap-list">
+                <li>
+                  <span>Invicta en negociación:</span>
+                  <strong className="mono-num text-main">
+                    {formatCOP(fin.remainingInvictaNegotiation || 85000)}
+                  </strong>
+                </li>
+                <li>
+                  <span>4 Invictas restantes ($80k c/u):</span>
+                  <strong className="mono-num text-main">
+                    {formatCOP(fin.remainingInvictaStockValue || 320000)}
+                  </strong>
+                </li>
+                <li>
+                  <span>4 Rolex restantes ($100k c/u):</span>
+                  <strong className="mono-num text-main">
+                    {formatCOP(fin.remainingRolexStockValue || 400000)}
+                  </strong>
+                </li>
+              </ul>
+            </div>
+            <div className="kap-card-total">
+              <span>Total Ingreso Bruto:</span>
+              <strong className="mono-num text-emerald">
+                {formatCOP(fin.totalGrossRemainingRevenue || 805000)}
+              </strong>
+            </div>
+          </div>
+
+          {/* 2. Descuento Inversión Pendiente */}
+          <div className="kap-card">
+            <div>
+              <div className="kap-card-title text-rose">
+                <Coins size={16} /> 2. Descuento de Inversión Pendiente
+              </div>
+              <ul className="kap-list">
+                <li>
+                  <span>Faltante para saldar Invictas:</span>
+                  <strong className="mono-num text-rose">
+                    -{formatCOP(fin.pendingInvictaRecovery || 20000)}
+                  </strong>
+                </li>
+                <li>
+                  <span>Faltante para saldar Rolex:</span>
+                  <strong className="mono-num text-rose">
+                    -{formatCOP(fin.pendingRolexRecovery || 20000)}
+                  </strong>
+                </li>
+                <li>
+                  <span>Objetivo:</span>
+                  <span className="badge badge-emerald">Quedar en $0 Deuda</span>
+                </li>
+              </ul>
+            </div>
+            <div className="kap-card-total">
+              <span>Total a Restar:</span>
+              <strong className="mono-num text-rose">
+                -{formatCOP(fin.totalPendingInvestmentRecovery || 40000)}
+              </strong>
+            </div>
+          </div>
+
+          {/* 3. Ganancia Neta Limpia Total */}
+          <div className="kap-card" style={{ border: "1px solid rgba(229, 184, 105, 0.4)" }}>
+            <div>
+              <div className="kap-card-title gold-text">
+                <Sparkles size={16} /> 3. Ganancia Neta Limpia Total
+              </div>
+              <ul className="kap-list">
+                <li>
+                  <span>Ingreso Bruto:</span>
+                  <strong className="mono-num text-emerald">
+                    {formatCOP(fin.totalGrossRemainingRevenue || 805000)}
+                  </strong>
+                </li>
+                <li>
+                  <span>Menos Faltante a Saldar:</span>
+                  <strong className="mono-num text-rose">
+                    -{formatCOP(fin.totalPendingInvestmentRecovery || 40000)}
+                  </strong>
+                </li>
+                <li>
+                  <span>Estado de Deuda de Lotes:</span>
+                  <strong className="text-emerald">100% Recuperadas ($0 Deuda)</strong>
+                </li>
+              </ul>
+            </div>
+            <div className="kap-card-total">
+              <span className="gold-text">Ganancia Neta Limpia:</span>
+              <strong className="mono-num gold-text" style={{ fontSize: "1.1rem" }}>
+                {formatCOP(fin.netCleanProfitRemaining || 765000)}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        {/* Reparto 50/50 y Liquidación con Ajustes */}
+        <div className="kap-settle-strip">
+          <div className="kap-settle-partner">
+            <span className="badge badge-emerald">Para ti (Elian Navarro)</span>
+            <div className="text-xs text-dim">
+              Ganancia 50% ({formatCOP(fin.netCleanProfit50Each || 382500)}) + Retiro Rolex ({formatCOP(fin.elianRolexAdvance || 60000)}) + Cobro Deuda Juan ({formatCOP(fin.juanRemainingDebt || 37000)})
+            </div>
+            <strong className="mono-num text-emerald" style={{ fontSize: "1.25rem" }}>
+              {formatCOP(fin.elianFinalProjectedPayout || 479500)}
+            </strong>
+          </div>
+
+          <div className="div-divider" style={{ height: 40 }} />
+
+          <div className="kap-settle-partner">
+            <span className="badge badge-gold">Para Juan</span>
+            <div className="text-xs text-dim">
+              Ganancia 50% ({formatCOP(fin.netCleanProfit50Each || 382500)}) - Pago Deuda a Elian (-{formatCOP(fin.juanRemainingDebt || 37000)})
+            </div>
+            <strong className="mono-num text-gold" style={{ fontSize: "1.25rem" }}>
+              {formatCOP(fin.juanFinalProjectedPayout || 345500)}
+            </strong>
           </div>
         </div>
       </div>

@@ -4,6 +4,8 @@ import {
   Calendar, CheckCircle2, Edit2, Check, X, Shield, Package
 } from "lucide-react";
 import { FinancialCharts } from "../components/FinancialCharts";
+import { FounderMindsetBar } from "../components/FounderMindsetBar";
+import { KronoVision50 } from "../components/KronoVision50";
 
 function EditableValue({ value, onSave, isEditMode, format, suffix = "" }) {
   const [editing, setEditing] = useState(false);
@@ -43,10 +45,10 @@ export function OverviewPage({ financials: fin, formatCOP, onOpenDebtModal, onOp
       label: "Ventas del Lote",
       value: formatCOP(fin.totalSalesAll),
       sub: `3 cobradas + 1 pendiente (${formatCOP(fin.totalSalesPending)})`,
-      color: "#e5b869",
+      color: "#818cf8",
       icon: TrendingUp,
       badge: `${fin.salesCountCompleted + fin.salesCountPending} Relojes`,
-      badgeClass: "badge-gold",
+      badgeClass: "badge-indigo",
       up: true,
     },
     {
@@ -83,11 +85,46 @@ export function OverviewPage({ financials: fin, formatCOP, onOpenDebtModal, onOp
             <strong>Cobro Pendiente: 30 de Octubre</strong>
             <p>La 4ª venta de reloj Invicta (amiga) por <strong>{formatCOP(pendingSale.amount)}</strong> debe cobrarse hoy en la quincena.</p>
           </div>
-          <button className="btn-sm btn-gold" onClick={() => { if(window.confirm("¿Marcar como cobrado?")) { onUpdateTx(pendingSale.id, { status: "completado" }); }}}>
+          <button className="btn-sm btn-indigo" onClick={() => { if(window.confirm("¿Marcar como cobrado?")) { onUpdateTx(pendingSale.id, { status: "completado" }); }}}>
             <CheckCircle2 size={14}/> Marcar Cobrado
           </button>
         </div>
       )}
+
+      {/* Banner Resumen Inventario Restante Actualizado */}
+      <FounderMindsetBar />
+
+      <div className="society-banner dash-panel" style={{ border: "1px solid rgba(99, 102, 241, 0.35)", marginBottom: 20 }}>
+        <div className="sb-metric">
+          <span className="sbm-label">Inventario Restante (5 Invictas + 4 Rolex)</span>
+          <strong className="sbm-val mono-num text-emerald">+{formatCOP(fin.totalGrossRemainingRevenue || 805000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Ingreso bruto por entrar</span>
+        </div>
+        <div className="sb-divv" />
+        <div className="sb-metric">
+          <span className="sbm-label">Faltante a Saldar ($0 Deuda)</span>
+          <strong className="sbm-val mono-num text-rose">-{formatCOP(fin.totalPendingInvestmentRecovery || 40000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>$20k Invictas + $20k Rolex</span>
+        </div>
+        <div className="sb-divv" />
+        <div className="sb-metric">
+          <span className="sbm-label">Ganancia Neta Limpia (50/50)</span>
+          <strong className="sbm-val mono-num text-emerald" style={{ textShadow: "0 0 12px rgba(16, 185, 129, 0.3)" }}>{formatCOP(fin.netCleanProfitRemaining || 765000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "#34d399" }}>{formatCOP(fin.netCleanProfit50Each || 382500)} c/u</span>
+        </div>
+        <div className="sb-divv" />
+        <div className="sb-metric">
+          <span className="sbm-label">Deuda Juan a Elian</span>
+          <strong className="sbm-val mono-num text-rose">{formatCOP(fin.juanRemainingDebt || 37000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Juan debe $37k</span>
+        </div>
+        <div className="sb-divv" />
+        <div className="sb-metric">
+          <span className="sbm-label">Retiro Rolex Elian</span>
+          <strong className="sbm-val mono-num text-indigo">+{formatCOP(fin.elianRolexAdvance || 60000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Capital puesto por Elian</span>
+        </div>
+      </div>
 
       {/* KPI Grid */}
       <div className="kpi-grid-4">
@@ -120,65 +157,53 @@ export function OverviewPage({ financials: fin, formatCOP, onOpenDebtModal, onOp
       {/* Interactive Visual Analytics & Charts */}
       <FinancialCharts financials={fin} transactions={transactions} formatCOP={formatCOP} />
 
-      {/* Charts + Settlement Row */}
-      <div className="two-col-grid">
-        {/* Left: Financial Summary Table */}
-        <div className="dash-panel">
-          <div className="panel-head">
-            <h3 className="panel-title">Resumen Contable del Lote</h3>
-            <span className="badge badge-gold">Lote Inicial Invicta</span>
+      {/* Plan de Cosecha & Sueldo Mensual Limpio (Meta 50 Relojes) */}
+      <KronoVision50 formatCOP={formatCOP} currentWatches={14} />
+
+      {/* Resumen Oficial de Cierre de Inventario (8 Invictas & 6 Rolex) */}
+      <div className="dash-panel" style={{ border: "1px solid rgba(129, 140, 248, 0.25)" }}>
+        <div className="panel-head">
+          <div>
+            <h3 className="panel-title text-indigo font-bold">Balance del Negocio: Lotes Activos (8 Invictas & 6 Rolex)</h3>
+            <p className="panel-subtitle" style={{ margin: "4px 0 0 0", fontSize: "0.82rem", color: "var(--text-dim)" }}>
+              Catálogo de 14 relojes: 5 unidades ya vendidas/entregadas y 9 unidades restantes en rotación para liquidar a $0 deuda.
+            </p>
           </div>
-          <div className="summary-table">
-            {[
-              { label: "Inversión Total del Lote (7 relojes)", val: formatCOP(fin.lotBaseCost), color: "#f43f5e" },
-              { label: "Ventas Cobradas (3 relojes)", val: `+${formatCOP(fin.totalSalesCompleted)}`, color: "#10b981" },
-              { label: "Ventas Pendientes (30 Oct)", val: `+${formatCOP(fin.totalSalesPending)}`, color: "#f59e0b" },
-              { label: "Insumos y Gastos Operativos", val: `-${formatCOP(fin.totalSupplies)}`, color: "#f43f5e" },
-              { label: "Ganancia Bruta del Lote", val: `+${formatCOP(fin.lotGrossProfit)}`, color: "#10b981", bold: true },
-              { label: "Fondo Re-inversión 50%", val: formatCOP(fin.reinvestmentFund50), color: "#06b6d4" },
-              { label: "Utilidad a Distribuir 50/50", val: formatCOP(fin.distributableProfit50), color: "#e5b869", bold: true },
-            ].map((row, i) => (
-              <div key={i} className={`st-row ${row.bold ? "st-row-bold" : ""}`}>
-                <span className="st-label">{row.label}</span>
-                <span className="st-val mono-num" style={{ color: row.color }}>{row.val}</span>
-              </div>
-            ))}
-          </div>
+          <span className="badge badge-indigo">Krono 50/50</span>
         </div>
 
-        {/* Right: Settlement */}
-        <div className="dash-panel">
-          <div className="panel-head">
-            <h3 className="panel-title">Liquidación Equitativa</h3>
-            <span className="badge badge-emerald">50/50 Krono</span>
+        <div className="summary-table" style={{ marginTop: 14 }}>
+          <div className="st-row">
+            <span className="st-label">📦 Catálogo Total Adquirido</span>
+            <span className="st-val mono-num text-main">14 Relojes (8 Invictas + 6 Rolex pedidos)</span>
           </div>
-          <div className="settlement-grid">
-            {[
-              { name: "Elian Navarro", init: "EN", color: "#10b981", aporte: fin.elianLotPaid, insumos: fin.elianSupplies, total: fin.totalCapitalElian, ganancia: fin.elianNominalProfit, extra: fin.juanRemainingDebt, extraLabel: "Deuda Juan por cobrar" },
-              { name: "Juan", init: "JS", color: "#e5b869", aporte: fin.juanLotPaid, insumos: fin.juanSupplies, total: fin.totalCapitalJuan, ganancia: fin.juanNominalProfit, extra: -fin.juanRemainingDebt, extraLabel: "Deuda pendiente a descontar" },
-            ].map((s, i) => (
-              <div key={i} className="settle-box" style={{ "--settle-color": s.color }}>
-                <div className="sb-header">
-                  <div className="sb-avatar" style={{ background: `${s.color}25`, color: s.color }}>{s.init}</div>
-                  <div><strong className="sb-name">{s.name}</strong></div>
-                </div>
-                <div className="sb-rows">
-                  <div className="sb-row"><span>Aporte lote:</span><span className="mono-num">{formatCOP(s.aporte)}</span></div>
-                  <div className="sb-row"><span>Insumos propios:</span><span className="mono-num">{formatCOP(s.insumos)}</span></div>
-                  <div className="sb-row sb-total"><span>Capital total:</span><span className="mono-num" style={{ color: s.color }}>{formatCOP(s.total)}</span></div>
-                  <div className="sb-divider" />
-                  <div className="sb-row"><span>Ganancia base 50%:</span><span className="mono-num">{formatCOP(s.ganancia)}</span></div>
-                  <div className="sb-row" style={{ color: s.extra >= 0 ? "#10b981" : "#f43f5e" }}>
-                    <span>{s.extraLabel}:</span>
-                    <span className="mono-num">{s.extra >= 0 ? "+" : ""}{formatCOP(Math.abs(s.extra))}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="st-row">
+            <span className="st-label">✅ Relojes ya Vendidos / Salidos</span>
+            <span className="st-val mono-num text-emerald">5 Unidades (3 Invictas cobrados + 2 Rolex entregados)</span>
           </div>
-          <div className="settle-note">
-            <Shield size={14} />
-            <span>Transparencia total: Juan descuenta su deuda pendiente de las utilidades que le corresponden.</span>
+          <div className="st-row">
+            <span className="st-label">⏳ Inventario Restante por Entrar</span>
+            <span className="st-val mono-num text-main">9 Unidades (1 Invicta neg $85k + 4 Invictas $320k + 4 Rolex $400k)</span>
+          </div>
+          <div className="st-row">
+            <span className="st-label">💵 Total Ingreso Bruto por Entrar</span>
+            <span className="st-val mono-num text-emerald" style={{ fontWeight: 700 }}>+{formatCOP(fin.totalGrossRemainingRevenue || 805000)}</span>
+          </div>
+          <div className="st-row">
+            <span className="st-label">📉 Descuento Inversión Pendiente (Para $0 Deuda)</span>
+            <span className="st-val mono-num text-rose">-{formatCOP(fin.totalPendingInvestmentRecovery || 40000)} ($20k Invictas + $20k Rolex)</span>
+          </div>
+          <div className="st-row st-row-bold" style={{ background: "rgba(129, 140, 248, 0.08)" }}>
+            <span className="st-label text-indigo font-bold">💰 Ganancia Neta Limpia Total Proyectada</span>
+            <span className="st-val mono-num text-emerald font-bold" style={{ fontSize: "1.1rem" }}>+{formatCOP(fin.netCleanProfitRemaining || 765000)}</span>
+          </div>
+          <div className="st-row">
+            <span className="st-label">🤝 Reparto Equitativo 50 / 50</span>
+            <span className="st-val mono-num text-main">{formatCOP(fin.netCleanProfit50Each || 382500)} para Elian • {formatCOP(fin.netCleanProfit50Each || 382500)} para Juan</span>
+          </div>
+          <div className="st-row">
+            <span className="st-label">👑 Ajustes de Socios</span>
+            <span className="st-val mono-num text-dim">Juan debe $37.000 a Elian | Elian retira $60.000 puestos para Rolex</span>
           </div>
         </div>
       </div>

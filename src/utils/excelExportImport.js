@@ -18,7 +18,7 @@ export function exportKronoToExcel(data) {
     ["Ventas del Lote Cobradas", fin.totalSalesCompleted],
     ["Ventas del Lote Pendientes (30 Oct)", fin.totalSalesPending],
     ["Ventas Totales del Lote", fin.totalSalesAll],
-    ["Costo Base del Lote (7 Relojes)", fin.lotBaseCost],
+    ["Costo Base de Lotes Activos (8 Invictas & 6 Rolex)", fin.lotBaseCost],
     ["Ganancia Bruta del Lote", fin.lotGrossProfit],
     ["Fondo Obligatorio de Re-inversión (50% Próximo Lote)", fin.reinvestmentFund50],
     ["Utilidad Distribuible a Socios (50%)", fin.distributableProfit50],

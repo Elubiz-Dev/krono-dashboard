@@ -52,6 +52,38 @@ export function InventoryPage({
 
   return (
     <div className="page-layout inventory-page-v2">
+      {/* Banner de Proyección del Inventario Restante */}
+      <div className="society-banner dash-panel" style={{ border: "1px solid rgba(229,184,105,0.3)" }}>
+        <div className="sb-metric">
+          <span className="sbm-label">Inventario Restante Krono</span>
+          <strong className="sbm-val gold-text">9 Relojes por Liquidar</strong>
+        </div>
+        <div className="sb-divv" />
+        <div className="sb-metric">
+          <span className="sbm-label">Ingresos Brutos por Entrar</span>
+          <strong className="sbm-val mono-num text-emerald">{formatCOP(805000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>
+            1 Invicta ($85k) + 4 Invictas ($320k) + 4 Rolex ($400k)
+          </span>
+        </div>
+        <div className="sb-divv" />
+        <div className="sb-metric">
+          <span className="sbm-label">Descuento Inversión ($0 Deuda)</span>
+          <strong className="sbm-val mono-num text-rose">-{formatCOP(40000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>
+            $20k Invictas + $20k Rolex
+          </span>
+        </div>
+        <div className="sb-divv" />
+        <div className="sb-metric">
+          <span className="sbm-label">Ganancia Neta Limpia (50/50)</span>
+          <strong className="sbm-val mono-num gold-text">{formatCOP(765000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "#34d399" }}>
+            $382.500 Elian / $382.500 Juan
+          </span>
+        </div>
+      </div>
+
       {/* Top Category Hero Cards */}
       <div className="cat-hero-grid">
         {/* ROLEX CARD */}
@@ -69,10 +101,10 @@ export function InventoryPage({
             </div>
             <h2 className="chc-title gold-text">Colección ROLEX</h2>
             <p className="chc-desc">
-              Lote premium de escalamiento: Submariner Cerachrom, Daytona Panda, Datejust Jubilee & Day-Date President.
+              Lote disponible: Submariner Cerachrom, Daytona Panda, Datejust Jubilee & Day-Date President.
             </p>
             <div className="chc-footer">
-              <span className="chc-tagline">Margen estimado: ~100% de utilidad</span>
+              <span className="chc-tagline text-gold">4 disponibles en stock a $100.000 c/u • $400.000 total</span>
               <span className="chc-action-link">
                 {categoryFilter === "rolex" ? "Viendo Rolex" : "Filtrar Rolex"} <ArrowRight size={14} />
               </span>
@@ -95,10 +127,10 @@ export function InventoryPage({
             </div>
             <h2 className="chc-title text-cyan-primary">Colección INVICTA</h2>
             <p className="chc-desc">
-              Lote inicial de 7 cronógrafos: Subaqua Gold Master, Bolt Phantom, Bolt Zeus Magnum y Skeleton Editions.
+              Cronógrafos Krono: Subaqua Reserve, Bolt Zeus Magnum Master Gold y Crimson Skeleton.
             </p>
             <div className="chc-footer">
-              <span className="chc-tagline">3 vendidos • 4 en rotación activa</span>
+              <span className="chc-tagline text-cyan">1 en negociación ($85k) + 4 disponibles ($80k c/u = $320k)</span>
               <span className="chc-action-link">
                 {categoryFilter === "invicta" ? "Viendo Invicta" : "Filtrar Invicta"} <ArrowRight size={14} />
               </span>

@@ -14,7 +14,7 @@ const navItems = [
 ];
 
 export function Sidebar({ activePage, setActivePage, collapsed, setCollapsed, activeUser, partner, onLogout, juanRemainingDebt }) {
-  const userColor = activeUser?.color || "#e5b869";
+  const userColor = activeUser?.color || (activeUser?.id === "elian" ? "#10b981" : "#818cf8");
 
   return (
     <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}>
@@ -81,7 +81,7 @@ export function Sidebar({ activePage, setActivePage, collapsed, setCollapsed, ac
           <div className="sidebar-user-info">
             <span className="sidebar-user-name">{activeUser?.name}</span>
             <span className="sidebar-user-role" style={{ color: userColor }}>
-              {activeUser?.id === "elian" ? "Operaciones" : "Ventas"}
+              Cofundador • {activeUser?.id === "elian" ? "Finanzas" : "Ventas"}
             </span>
           </div>
         )}

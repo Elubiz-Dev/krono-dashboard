@@ -107,7 +107,7 @@ export function PartnersTab({
               <li>Adquisición y mantenimiento del kit de herramientas de relojería profesional.</li>
               <li>Suministro de tarjetas de presentación de la marca Krono.</li>
               <li>Control contable, flujo de caja y balances financieros de la sociedad.</li>
-              <li>Financiación del diferencial inicial del lote para asegurar el stock de los 7 relojes.</li>
+              <li>Financiación del diferencial inicial del lote para asegurar el stock de los relojes.</li>
             </ul>
           </div>
         </div>

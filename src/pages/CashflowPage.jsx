@@ -81,7 +81,7 @@ export function CashflowPage({ transactions, onOpenNewTx, onToggleStatus, onDele
             <option value="aporte_lote">Aportes</option>
             <option value="cuenta_cobrar">Por Cobrar</option>
           </select>
-          <button className="btn-sm btn-gold" onClick={onOpenNewTx}><PlusCircle size={15}/> Registrar</button>
+          <button className="btn-sm btn-indigo" onClick={onOpenNewTx}><PlusCircle size={15}/> Registrar</button>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export function CashflowPage({ transactions, onOpenNewTx, onToggleStatus, onDele
         <div className="css-item"><span>Movimientos:</span><strong>{filtered.length}</strong></div>
         <div className="css-item"><span>Entradas:</span><strong className="text-emerald mono-num">+{formatCOP(totIn)}</strong></div>
         <div className="css-item"><span>Salidas:</span><strong className="text-rose mono-num">-{formatCOP(totOut)}</strong></div>
-        <div className="css-item"><span>Balance:</span><strong className="text-gold mono-num">{formatCOP(totIn - totOut)}</strong></div>
+        <div className="css-item"><span>Balance:</span><strong className="text-indigo mono-num">{formatCOP(totIn - totOut)}</strong></div>
       </div>
 
       {/* Table */}

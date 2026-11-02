@@ -774,10 +774,11 @@
   background: rgba(245, 158, 11, 0.04);
 }
 
+.tx-title-wrap,
 .tx-desc-cell {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .tx-title {
@@ -785,9 +786,12 @@
   color: var(--text-main);
 }
 
+.tx-note,
 .tx-notes {
   font-size: 0.74rem;
   color: var(--text-dim);
+  line-height: 1.35;
+  margin-top: 1px;
 }
 
 .partner-chip {
@@ -5092,6 +5096,207 @@ body {
   line-height: 1.5;
 }
 
+/* Performance & Margin Grid in Financial Charts */
+.fc-perf-dual-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.fc-perf-card {
+  background: rgba(14, 18, 26, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.25s ease;
+}
+
+.fc-perf-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+.fc-perf-card.perf-invicta {
+  border-top: 3px solid #10b981;
+}
+
+.fc-perf-card.perf-rolex {
+  border-top: 3px solid #6366f1;
+}
+
+.fc-perf-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fc-perf-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fc-perf-metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.fc-perf-metric-row.perf-highlight {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 6px;
+  margin-top: 2px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.fc-perf-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fc-perf-bar-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.fc-perf-bar-fill-invicta {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+}
+
+.fc-perf-bar-fill-rolex {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+}
+
+.fc-unit-gain-box {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 4px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Lots Control Grid in Financial Charts */
+.fc-lots-dual-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 16px;
+}
+
+.fc-lot-card {
+  background: rgba(14, 18, 26, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s ease;
+}
+
+.fc-lot-card:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateY(-2px);
+}
+
+.fc-lot-card-invicta {
+  border-top: 3px solid #10b981;
+}
+
+.fc-lot-card-rolex {
+  border-top: 3px solid #6366f1;
+}
+
+.fc-lot-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fc-lot-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fc-lot-progress-fill-invicta {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  border-radius: 999px;
+}
+
+.fc-lot-progress-fill-rolex {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  border-radius: 999px;
+}
+
+.fc-lot-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 0.8rem;
+}
+
+.fc-lot-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #94a3b8;
+}
+
+.fc-lot-stats-row.highlight-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+  margin-top: 2px;
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.fc-partner-payout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.fc-partner-payout-box {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fc-partner-payout-box.elian-payout {
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.fc-partner-payout-box.juan-payout {
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
 /* ==========================================================================
    WATCH RESERVATION / APARTADO STYLES
    ========================================================================== */
@@ -5340,6 +5545,343 @@ body {
 .pulse-cloud {
   animation: pulse-cloud 1.2s infinite ease-in-out;
 }
+
+/* =========================================================
+   PRECISION SLIDER WITH FLOATING BUBBLE & GLOWING TRACK
+   ========================================================= */
+.precision-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: all 0.2s ease;
+}
+
+.precision-slider-group:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.psg-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.psg-step-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.psg-step-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: var(--gold-primary);
+  transform: translateY(-1px);
+}
+
+.psg-clickable-val {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  transition: all 0.15s ease;
+  font-size: 0.92rem;
+}
+
+.psg-clickable-val:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--gold-primary);
+}
+
+.psg-edit-icon {
+  opacity: 0.6;
+}
+
+.psg-manual-input {
+  background: #0f121a;
+  border: 1.5px solid var(--gold-primary);
+  color: #fff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.92rem;
+  width: 100px;
+  font-weight: 700;
+  outline: none;
+}
+
+.psg-slider-track-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 26px;
+  padding-bottom: 6px;
+}
+
+/* Dynamic floating bubble directly above the Thumb */
+.psg-floating-bubble {
+  position: absolute;
+  top: -2px;
+  transform: translateX(-50%);
+  background: #11141f;
+  border: 1.5px solid var(--gold-primary);
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #ffffff;
+  pointer-events: none;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  transition: left 0.04s linear;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.psg-bubble-text {
+  letter-spacing: 0.2px;
+}
+
+.psg-bubble-arrow {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--gold-primary);
+}
+
+/* Custom styled Range Input */
+.sim-slider-v2 {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.sim-slider-v2::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--gold-primary);
+  box-shadow: 0 0 12px rgba(229, 184, 105, 0.7), 0 2px 6px rgba(0, 0, 0, 0.6);
+  cursor: grab;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sim-slider-v2::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 16px rgba(229, 184, 105, 0.9), 0 3px 8px rgba(0, 0, 0, 0.7);
+}
+
+.sim-slider-v2::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.3);
+}
+
+/* Color overrides */
+.color-emerald .sim-slider-v2::-webkit-slider-thumb {
+  border-color: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.7), 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+.color-emerald .sim-slider-v2::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.9), 0 3px 8px rgba(0, 0, 0, 0.7);
+}
+
+.color-cyan .sim-slider-v2::-webkit-slider-thumb {
+  border-color: #06b6d4;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.7), 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.tick-label-clickable {
+  cursor: pointer;
+  transition: color 0.15s;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.tick-label-clickable:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Presets Strip */
+.sim-presets-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.sim-presets-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sim-preset-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-main);
+  padding: 5px 11px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sim-preset-btn:hover {
+  background: rgba(229, 184, 105, 0.15);
+  border-color: var(--gold-primary);
+  color: var(--gold-primary);
+  transform: translateY(-1px);
+}
+
+/* Updated Projection Section matching WhatsApp / Gemini */
+.krono-actual-projection-panel {
+  margin-top: 24px;
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(15, 20, 30, 0.95) 100%);
+  border: 1px solid rgba(229, 184, 105, 0.35);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(229, 184, 105, 0.08);
+}
+
+.kap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.kap-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.kap-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kap-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.kap-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kap-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.kap-card-total {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.kap-settle-strip {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(229, 184, 105, 0.08);
+  border: 1px solid rgba(229, 184, 105, 0.25);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.kap-settle-partner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ================= KRONO VISION 50 PANEL ================= */
+.krono-vision-panel {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.krono-vision-panel:hover {
+  border-color: rgba(99, 102, 241, 0.5) !important;
+  box-shadow: 0 14px 45px rgba(0, 0, 0, 0.7), 0 0 35px rgba(99, 102, 241, 0.18) !important;
+}
+
+@media (max-width: 768px) {
+  .krono-vision-panel {
+    padding: 16px 14px !important;
+  }
+}
+
+
 
 
 
