@@ -458,3 +458,4 @@ export function KronoVision50({ formatCOP, currentWatches = 14 }) {
 }
 
 export default KronoVision50;
+
