@@ -462,3 +462,4 @@ export function QuickSaleModal({
 }
 
 export default QuickSaleModal;
+
