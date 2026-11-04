@@ -12,6 +12,7 @@ import { StrategyPage } from "./pages/StrategyPage";
 import { NewTransactionModal } from "./components/NewTransactionModal";
 import { DebtSettleModal } from "./components/DebtSettleModal";
 import { ReserveWatchModal } from "./components/ReserveWatchModal";
+import { QuickSaleModal } from "./components/QuickSaleModal";
 import { LoginScreen } from "./components/LoginScreen";
 import { TopBar } from "./components/TopBar";
 import confetti from "canvas-confetti";
@@ -59,6 +60,8 @@ export function App() {
   const [isDebtModalOpen, setIsDebtModalOpen] = useState(false);
   const [isReserveModalOpen, setIsReserveModalOpen] = useState(false);
   const [reserveTargetWatch, setReserveTargetWatch] = useState(null);
+  const [isQuickSaleOpen, setIsQuickSaleOpen] = useState(false);
+  const [saleTargetWatch, setSaleTargetWatch] = useState(null);
   const [toast, setToast] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [cloudStatus, setCloudStatus] = useState("syncing"); // 'synced' | 'syncing' | 'offline'
@@ -384,6 +387,77 @@ export function App() {
     showToast("Apartado cancelado. Reloj liberado al inventario disponible.", "info");
   };
 
+  // QUICK SALE HANDLERS (Descargo Oficial con Trazabilidad)
+  const handleOpenSaleModal = (watch) => {
+    setSaleTargetWatch(watch);
+    setIsQuickSaleOpen(true);
+  };
+
+  const handleConfirmQuickSale = ({
+    watchId,
+    soldBy,
+    soldPrice,
+    payMethod,
+    custody,
+    clientName,
+    clientPhone,
+    notes,
+    date,
+  }) => {
+    const today = date || new Date().toISOString().split("T")[0];
+    const watch = inventory.find((w) => w.id === watchId);
+    const watchModel = watch ? watch.model : "Reloj Krono";
+    const watchSku = watch ? (watch.sku || watch.id) : "";
+
+    // 1. Transaction in cashflow
+    const newTx = {
+      id: `tx-sale-${Date.now()}`,
+      date: today,
+      type: "entrada",
+      category: "venta",
+      partner: soldBy || "ambos",
+      description: `Venta: ${watchModel} (${watchSku})`,
+      amount: Number(soldPrice),
+      status: "completado",
+      notes: `Descargo de venta: cerrado por ${soldBy === "elian" ? "Elian Navarro" : "Juan"}. Pago: ${payMethod}. ${clientName ? `Cliente: ${clientName}. ` : ""}${clientPhone ? `Tel: ${clientPhone}. ` : ""}Custodia dinero: ${custody === "elian" ? "Elian" : "Juan"}. ${notes || ""}`.trim(),
+      watchId,
+      addedBy: activeUser?.id || soldBy || "unknown",
+      addedAt: new Date().toISOString(),
+    };
+    setTransactions((prev) => [newTx, ...prev]);
+
+    // 2. Inventory update
+    setInventory((prev) =>
+      prev.map((w) => {
+        if (w.id === watchId) {
+          const nextStock = Math.max(0, (w.stock || 1) - 1);
+          return {
+            ...w,
+            stock: nextStock,
+            status: nextStock === 0 ? "Agotado" : "Disponible",
+            soldPrice: Number(soldPrice),
+            soldBy: soldBy,
+            soldDate: today,
+            payMethod: payMethod,
+            custody: custody,
+            clientName: clientName || null,
+            clientPhone: clientPhone || null,
+            highlight: `Vendido por ${soldBy === "elian" ? "Elian" : "Juan"} el ${today} (${formatCOP(soldPrice)})`,
+          };
+        }
+        return w;
+      })
+    );
+
+    confetti({
+      particleCount: 120,
+      spread: 75,
+      origin: { y: 0.6 },
+      colors: ["#10b981", "#34d399", "#818cf8", "#e0e7ff"],
+    });
+    showToast(`🎉 ¡Venta de ${watchModel} registrada por ${soldBy === "elian" ? "Elian" : "Juan"}!`);
+  };
+
   // If not logged in, show login
   if (!activeUser) {
     return <LoginScreen onLogin={handleLogin} partners={INITIAL_DATA.partners} />;
@@ -402,7 +476,7 @@ export function App() {
     onToggleAgreement: handleToggleAgreement,
     onAddAgreement: handleAddAgreement,
     onUpdateLotConfig: setLotConfig,
-    onSellWatch: () => setIsNewTxOpen(true),
+    onSellWatch: handleOpenSaleModal,
     onOpenReserve: handleOpenReserve,
     onCompleteReservation: handleCompleteReservation,
     onCancelReservation: handleCancelReservation,
@@ -482,6 +556,14 @@ export function App() {
         watch={reserveTargetWatch}
         onConfirmReserve={handleConfirmReserve}
         formatCOP={formatCOP}
+      />
+      <QuickSaleModal
+        isOpen={isQuickSaleOpen}
+        onClose={() => setIsQuickSaleOpen(false)}
+        watch={saleTargetWatch}
+        onConfirmSale={handleConfirmQuickSale}
+        formatCOP={formatCOP}
+        activeUser={activeUser}
       />
     </div>
   );
