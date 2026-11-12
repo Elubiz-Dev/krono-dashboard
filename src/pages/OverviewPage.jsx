@@ -42,19 +42,19 @@ export function OverviewPage({ financials: fin, formatCOP, onOpenDebtModal, onOp
       up: true,
     },
     {
-      label: "Ventas del Lote",
-      value: formatCOP(fin.totalSalesAll),
-      sub: `3 cobradas + 1 pendiente (${formatCOP(fin.totalSalesPending)})`,
+      label: "Recaudado en Ventas",
+      value: formatCOP(fin.netSalesCollected || 490000),
+      sub: `6 ventas ($550k) - $60k préstamo Elian recuperado`,
       color: "#818cf8",
       icon: TrendingUp,
-      badge: `${fin.salesCountCompleted + fin.salesCountPending} Relojes`,
+      badge: "6 Vendidos",
       badgeClass: "badge-indigo",
       up: true,
     },
     {
-      label: "Fondo Rolex (50%)",
+      label: "Fondo Re-inversión",
       value: formatCOP(fin.reinvestmentFund50),
-      sub: `Meta: ${formatCOP(600000)} — ${Math.round((fin.reinvestmentFund50/600000)*100)}% completado`,
+      sub: `Para expansión de inventario y nuevos lotes`,
       color: "#06b6d4",
       icon: Sparkles,
       badge: "Re-inversión",
@@ -96,33 +96,33 @@ export function OverviewPage({ financials: fin, formatCOP, onOpenDebtModal, onOp
 
       <div className="society-banner dash-panel" style={{ border: "1px solid rgba(99, 102, 241, 0.35)", marginBottom: 20 }}>
         <div className="sb-metric">
-          <span className="sbm-label">Inventario Restante (5 Invictas + 4 Rolex)</span>
-          <strong className="sbm-val mono-num text-emerald">+{formatCOP(fin.totalGrossRemainingRevenue || 805000)}</strong>
-          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Ingreso bruto por entrar</span>
+          <span className="sbm-label">Inventario Restante (20 Relojes)</span>
+          <strong className="sbm-val mono-num text-emerald">+{formatCOP(fin.totalGrossRemainingRevenue || 1800000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>5 Invictas L1 + 3 Rolex L2 + 12 Lote 3</span>
         </div>
         <div className="sb-divv" />
         <div className="sb-metric">
           <span className="sbm-label">Faltante a Saldar ($0 Deuda)</span>
-          <strong className="sbm-val mono-num text-rose">-{formatCOP(fin.totalPendingInvestmentRecovery || 40000)}</strong>
-          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>$20k Invictas + $20k Rolex</span>
+          <strong className="sbm-val mono-num text-rose">-{formatCOP(fin.totalPendingInvestmentRecovery || 20000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Solo $20k Invictas (Rolex 100% saldado)</span>
         </div>
         <div className="sb-divv" />
         <div className="sb-metric">
           <span className="sbm-label">Ganancia Neta Limpia (50/50)</span>
-          <strong className="sbm-val mono-num text-emerald" style={{ textShadow: "0 0 12px rgba(16, 185, 129, 0.3)" }}>{formatCOP(fin.netCleanProfitRemaining || 765000)}</strong>
-          <span style={{ fontSize: "0.72rem", color: "#34d399" }}>{formatCOP(fin.netCleanProfit50Each || 382500)} c/u</span>
+          <strong className="sbm-val mono-num text-emerald" style={{ textShadow: "0 0 12px rgba(16, 185, 129, 0.3)" }}>{formatCOP(fin.netCleanProfitRemaining || 1373000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "#34d399" }}>{formatCOP(fin.netCleanProfit50Each || 686500)} c/u</span>
         </div>
         <div className="sb-divv" />
         <div className="sb-metric">
           <span className="sbm-label">Deuda Juan a Elian</span>
-          <strong className="sbm-val mono-num text-rose">{formatCOP(fin.juanRemainingDebt || 37000)}</strong>
-          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Juan debe $37k</span>
+          <strong className="sbm-val mono-num text-rose">{formatCOP(fin.juanRemainingDebt || 30000)}</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Juan debe $30k (abonó $7k)</span>
         </div>
         <div className="sb-divv" />
         <div className="sb-metric">
-          <span className="sbm-label">Retiro Rolex Elian</span>
-          <strong className="sbm-val mono-num text-indigo">+{formatCOP(fin.elianRolexAdvance || 60000)}</strong>
-          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Capital puesto por Elian</span>
+          <span className="sbm-label">Préstamo Rolex Elian</span>
+          <strong className="sbm-val mono-num text-indigo">¡Recuperado!</strong>
+          <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>$60k descontados ($490k en caja)</span>
         </div>
       </div>
 
@@ -158,15 +158,15 @@ export function OverviewPage({ financials: fin, formatCOP, onOpenDebtModal, onOp
       <FinancialCharts financials={fin} transactions={transactions} formatCOP={formatCOP} />
 
       {/* Plan de Cosecha & Sueldo Mensual Limpio (Meta 50 Relojes) */}
-      <KronoVision50 formatCOP={formatCOP} currentWatches={14} />
+      <KronoVision50 formatCOP={formatCOP} currentWatches={26} />
 
-      {/* Resumen Oficial de Cierre de Inventario (8 Invictas & 6 Rolex) */}
+      {/* Resumen Oficial de Cierre de Inventario (3 Lotes: 26 Relojes) */}
       <div className="dash-panel" style={{ border: "1px solid rgba(129, 140, 248, 0.25)" }}>
         <div className="panel-head">
           <div>
-            <h3 className="panel-title text-indigo font-bold">Balance del Negocio: Lotes Activos (8 Invictas & 6 Rolex)</h3>
+            <h3 className="panel-title text-indigo font-bold">Balance del Negocio: Catálogo Completo (26 Relojes)</h3>
             <p className="panel-subtitle" style={{ margin: "4px 0 0 0", fontSize: "0.82rem", color: "var(--text-dim)" }}>
-              Catálogo de 14 relojes: 5 unidades ya vendidas/entregadas y 9 unidades restantes en rotación para liquidar a $0 deuda.
+              Catálogo de 26 relojes: 6 unidades vendidas ($490k netos en caja tras reembolso de $60k a Elian) y 20 unidades restantes en rotación.
             </p>
           </div>
           <span className="badge badge-indigo">Krono 50/50</span>
@@ -175,35 +175,35 @@ export function OverviewPage({ financials: fin, formatCOP, onOpenDebtModal, onOp
         <div className="summary-table" style={{ marginTop: 14 }}>
           <div className="st-row">
             <span className="st-label">📦 Catálogo Total Adquirido</span>
-            <span className="st-val mono-num text-main">14 Relojes (8 Invictas + 6 Rolex pedidos)</span>
+            <span className="st-val mono-num text-main">26 Relojes (8 Invictas L1 + 6 Rolex L2 + 12 Lote 3)</span>
           </div>
           <div className="st-row">
-            <span className="st-label">✅ Relojes ya Vendidos / Salidos</span>
-            <span className="st-val mono-num text-emerald">5 Unidades (3 Invictas cobrados + 2 Rolex entregados)</span>
+            <span className="st-label">✅ Relojes ya Vendidos</span>
+            <span className="st-val mono-num text-emerald">6 Unidades (3 Invictas cobrados + 3 Rolex cobrados = $550k brutos)</span>
           </div>
           <div className="st-row">
-            <span className="st-label">⏳ Inventario Restante por Entrar</span>
-            <span className="st-val mono-num text-main">9 Unidades (1 Invicta neg $85k + 4 Invictas $320k + 4 Rolex $400k)</span>
+            <span className="st-label">⏳ Inventario Restante en Rotación</span>
+            <span className="st-val mono-num text-main">20 Unidades (5 Invictas L1 + 3 Rolex L2 + 12 Lote 3)</span>
           </div>
           <div className="st-row">
             <span className="st-label">💵 Total Ingreso Bruto por Entrar</span>
-            <span className="st-val mono-num text-emerald" style={{ fontWeight: 700 }}>+{formatCOP(fin.totalGrossRemainingRevenue || 805000)}</span>
+            <span className="st-val mono-num text-emerald" style={{ fontWeight: 700 }}>+{formatCOP(fin.totalGrossRemainingRevenue || 1800000)}</span>
           </div>
           <div className="st-row">
             <span className="st-label">📉 Descuento Inversión Pendiente (Para $0 Deuda)</span>
-            <span className="st-val mono-num text-rose">-{formatCOP(fin.totalPendingInvestmentRecovery || 40000)} ($20k Invictas + $20k Rolex)</span>
+            <span className="st-val mono-num text-rose">-{formatCOP(fin.totalPendingInvestmentRecovery || 20000)} (Solo faltan $20k de Invictas)</span>
           </div>
           <div className="st-row st-row-bold" style={{ background: "rgba(129, 140, 248, 0.08)" }}>
             <span className="st-label text-indigo font-bold">💰 Ganancia Neta Limpia Total Proyectada</span>
-            <span className="st-val mono-num text-emerald font-bold" style={{ fontSize: "1.1rem" }}>+{formatCOP(fin.netCleanProfitRemaining || 765000)}</span>
+            <span className="st-val mono-num text-emerald font-bold" style={{ fontSize: "1.1rem" }}>+{formatCOP(fin.netCleanProfitRemaining || 1373000)}</span>
           </div>
           <div className="st-row">
             <span className="st-label">🤝 Reparto Equitativo 50 / 50</span>
-            <span className="st-val mono-num text-main">{formatCOP(fin.netCleanProfit50Each || 382500)} para Elian • {formatCOP(fin.netCleanProfit50Each || 382500)} para Juan</span>
+            <span className="st-val mono-num text-main">{formatCOP(fin.netCleanProfit50Each || 686500)} para Elian • {formatCOP(fin.netCleanProfit50Each || 686500)} para Juan</span>
           </div>
           <div className="st-row">
-            <span className="st-label">👑 Ajustes de Socios</span>
-            <span className="st-val mono-num text-dim">Juan debe $37.000 a Elian | Elian retira $60.000 puestos para Rolex</span>
+            <span className="st-label">👑 Cuentas de Socios</span>
+            <span className="st-val mono-num text-dim">Juan debe $30.000 a Elian | Elian ya recuperó los $60.000 que prestó para Rolex</span>
           </div>
         </div>
       </div>

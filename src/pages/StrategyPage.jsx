@@ -498,7 +498,7 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
               </h3>
             </div>
             <p className="panel-subtitle">
-              Balance consolidado en tiempo real con 5 Invictas y 4 Rolex por vender, liquidación $0 deuda y cuentas entre socios.
+              Balance consolidado en tiempo real con 20 relojes por vender (5 Invictas L1, 3 Rolex L2, 12 Lote 3), liquidación $0 deuda y cuentas entre socios.
             </p>
           </div>
           <span className="badge badge-emerald">Krono 50/50</span>
@@ -513,21 +513,27 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
               </div>
               <ul className="kap-list">
                 <li>
-                  <span>Invicta en negociación:</span>
+                  <span>Invicta en negociación (1 ud):</span>
                   <strong className="mono-num text-main">
                     {formatCOP(fin.remainingInvictaNegotiation || 85000)}
                   </strong>
                 </li>
                 <li>
-                  <span>4 Invictas restantes ($80k c/u):</span>
+                  <span>4 Invictas restantes L1 ($80k c/u):</span>
                   <strong className="mono-num text-main">
                     {formatCOP(fin.remainingInvictaStockValue || 320000)}
                   </strong>
                 </li>
                 <li>
-                  <span>4 Rolex restantes ($100k c/u):</span>
+                  <span>3 Rolex restantes L2 ($100k c/u):</span>
                   <strong className="mono-num text-main">
-                    {formatCOP(fin.remainingRolexStockValue || 400000)}
+                    {formatCOP(fin.remainingRolexStockValue || 300000)}
+                  </strong>
+                </li>
+                <li>
+                  <span>Lote #3 (6 Rolex, 3 Pro Diver, 3 Ruleta):</span>
+                  <strong className="mono-num text-main">
+                    {formatCOP(fin.lote3StockValue || 1095000)}
                   </strong>
                 </li>
               </ul>
@@ -535,7 +541,7 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
             <div className="kap-card-total">
               <span>Total Ingreso Bruto:</span>
               <strong className="mono-num text-emerald">
-                {formatCOP(fin.totalGrossRemainingRevenue || 805000)}
+                {formatCOP(fin.totalGrossRemainingRevenue || 1800000)}
               </strong>
             </div>
           </div>
@@ -555,8 +561,14 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
                 </li>
                 <li>
                   <span>Faltante para saldar Rolex:</span>
+                  <strong className="mono-num text-emerald">
+                    $0 (100% Saldado)
+                  </strong>
+                </li>
+                <li>
+                  <span>Costo Mercancía Lote #3:</span>
                   <strong className="mono-num text-rose">
-                    -{formatCOP(fin.pendingRolexRecovery || 20000)}
+                    -{formatCOP(fin.lote3LotCost || 407000)}
                   </strong>
                 </li>
                 <li>
@@ -566,9 +578,9 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
               </ul>
             </div>
             <div className="kap-card-total">
-              <span>Total a Restar:</span>
+              <span>Total Inversión a Cubrir:</span>
               <strong className="mono-num text-rose">
-                -{formatCOP(fin.totalPendingInvestmentRecovery || 40000)}
+                -{formatCOP((fin.pendingInvictaRecovery || 20000) + (fin.lote3LotCost || 407000))}
               </strong>
             </div>
           </div>
@@ -581,27 +593,27 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
               </div>
               <ul className="kap-list">
                 <li>
-                  <span>Ingreso Bruto:</span>
+                  <span>Ingreso Bruto (20 relojes):</span>
                   <strong className="mono-num text-emerald">
-                    {formatCOP(fin.totalGrossRemainingRevenue || 805000)}
+                    {formatCOP(fin.totalGrossRemainingRevenue || 1800000)}
                   </strong>
                 </li>
                 <li>
-                  <span>Menos Faltante a Saldar:</span>
+                  <span>Menos Costos & Saldos:</span>
                   <strong className="mono-num text-rose">
-                    -{formatCOP(fin.totalPendingInvestmentRecovery || 40000)}
+                    -{formatCOP((fin.pendingInvictaRecovery || 20000) + (fin.lote3LotCost || 407000))}
                   </strong>
                 </li>
                 <li>
-                  <span>Estado de Deuda de Lotes:</span>
-                  <strong className="text-emerald">100% Recuperadas ($0 Deuda)</strong>
+                  <span>Estado Lotes Previos:</span>
+                  <strong className="text-emerald">Rolex 100% Ganancia / Invictas $20k</strong>
                 </li>
               </ul>
             </div>
             <div className="kap-card-total">
               <span className="gold-text">Ganancia Neta Limpia:</span>
               <strong className="mono-num gold-text" style={{ fontSize: "1.1rem" }}>
-                {formatCOP(fin.netCleanProfitRemaining || 765000)}
+                {formatCOP(fin.netCleanProfitRemaining || 1373000)}
               </strong>
             </div>
           </div>
@@ -612,10 +624,10 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
           <div className="kap-settle-partner">
             <span className="badge badge-emerald">Para ti (Elian Navarro)</span>
             <div className="text-xs text-dim">
-              Ganancia 50% ({formatCOP(fin.netCleanProfit50Each || 382500)}) + Retiro Rolex ({formatCOP(fin.elianRolexAdvance || 60000)}) + Cobro Deuda Juan ({formatCOP(fin.juanRemainingDebt || 37000)})
+              Ganancia 50% ({formatCOP(fin.netCleanProfit50Each || 686500)}) + Cobro Deuda Juan ({formatCOP(fin.juanRemainingDebt || 30000)})
             </div>
             <strong className="mono-num text-emerald" style={{ fontSize: "1.25rem" }}>
-              {formatCOP(fin.elianFinalProjectedPayout || 479500)}
+              {formatCOP(fin.elianFinalProjectedPayout || 716500)}
             </strong>
           </div>
 
@@ -624,10 +636,10 @@ export function StrategyPage({ financials, formatCOP, isEditMode, lotConfig, onU
           <div className="kap-settle-partner">
             <span className="badge badge-gold">Para Juan</span>
             <div className="text-xs text-dim">
-              Ganancia 50% ({formatCOP(fin.netCleanProfit50Each || 382500)}) - Pago Deuda a Elian (-{formatCOP(fin.juanRemainingDebt || 37000)})
+              Ganancia 50% ({formatCOP(fin.netCleanProfit50Each || 686500)}) - Pago Deuda a Elian (-{formatCOP(fin.juanRemainingDebt || 30000)})
             </div>
             <strong className="mono-num text-gold" style={{ fontSize: "1.25rem" }}>
-              {formatCOP(fin.juanFinalProjectedPayout || 345500)}
+              {formatCOP(fin.juanFinalProjectedPayout || 656500)}
             </strong>
           </div>
         </div>

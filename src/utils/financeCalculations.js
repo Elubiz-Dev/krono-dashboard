@@ -1,6 +1,15 @@
 // Pure financial calculations engine for Krono
 
-export function calculateFinancials(transactions, lotConfig = { totalCost: 460000, costPerPartner: 230000, invictaCost: 260000, rolexCost: 200000 }) {
+export function calculateFinancials(
+  transactions,
+  lotConfig = {
+    totalCost: 867000,
+    costPerPartner: 433500,
+    invictaCost: 260000,
+    rolexCost: 200000,
+    lote3Cost: 407000,
+  }
+) {
   let totalEntriesAll = 0;
   let totalEntriesCompleted = 0;
   let totalEntriesPending = 0;
@@ -68,27 +77,30 @@ export function calculateFinancials(transactions, lotConfig = { totalCost: 46000
 
   // Cuentas entre socios
   const agreedPerPartner = lotConfig.costPerPartner || 230000;
-  // Deuda confirmada entre socios: Juan le debe exactamente $37.000 a Elian
-  const juanRemainingDebt = 37000;
-  const juanDebtProgress = 72;
+  
+  // Deuda confirmada entre socios: Juan le debe exactamente $30.000 a Elian
+  const juanRemainingDebt = 30000;
+  const juanDebtProgress = Math.min(100, Math.round((juanLotPaid / 130000) * 100)) || 77;
 
   const totalSupplies = elianSupplies + juanSupplies;
-  const suppliesDifference = elianSupplies - juanSupplies; // If positive, Elian paid more supplies
+  const suppliesDifference = elianSupplies - juanSupplies;
 
   const totalCapitalElian = elianLotPaid + elianSupplies;
   const totalCapitalJuan = juanLotPaid + juanSupplies;
   const totalCapitalInjected = totalCapitalElian + totalCapitalJuan;
 
-  // Economía de los Lotes Activos (8 Invictas & 6 Rolex = 14 Relojes)
+  // Economía de los Lotes
   const totalSalesAll = totalSalesCompleted + totalSalesPending;
   const invictaLotCost = lotConfig.invictaCost || 260000;
   const rolexLotCost = lotConfig.rolexCost || 200000;
-  const lotBaseCost = invictaLotCost + rolexLotCost; // $460.000 COP total combinados
+  const lote3LotCost = lotConfig.lote3Cost || 407000;
+  const lotBaseCost = invictaLotCost + rolexLotCost; // $460.000 COP lotes 1 & 2
+  const totalAllLotsCost = lotBaseCost + lote3LotCost; // $867.000 COP los 3 lotes
   
-  // Ganancia Bruta del Lote (Ventas Totales - Costo Lote)
-  const lotGrossProfit = totalSalesAll - lotBaseCost;
+  // Ganancia Bruta del Lote 1 & 2
+  const lotGrossProfit = Math.max(0, totalSalesAll - lotBaseCost);
 
-  // Ganancia Neta estimada (restando insumos operativos)
+  // Ganancia Neta estimada restando insumos operativos
   const netProfitEstimated = totalSalesAll - lotBaseCost - totalSupplies;
 
   // 50% Fondo de Re-inversión obligatorio (Regla Krono #1)
@@ -99,34 +111,65 @@ export function calculateFinancials(transactions, lotConfig = { totalCost: 46000
   const elianNominalProfit = Math.round(distributableProfit50 * 0.5);
   const juanNominalProfit = Math.round(distributableProfit50 * 0.5);
 
-  // Liquidación real considerando que Juan debe a Elian
   const juanDebtOffset = Math.min(juanNominalProfit, juanRemainingDebt);
   const elianLiquidatedProfit = elianNominalProfit + juanDebtOffset;
   const juanLiquidatedProfit = juanNominalProfit - juanDebtOffset;
 
-  // Proyección Oficial de Cierre de Inventario Restante (Krono Timepieces)
+  // Préstamo Rolex Elian: $60.000 que Elian prestó y ya descontó/recuperó de los $550k brutos
+  const elianRolexAdvance = 0; // Saldo deudor a Elian: $0 (ya recuperó sus $60.000)
+  const elianRolexAdvanceRecovered = 60000; // Capital que Elian ya retiró con éxito
+  const netSalesCollected = totalSalesCompleted - elianRolexAdvanceRecovered; // $550.000 - $60.000 = $490.000 COP recaudados netos
+
+  // ═══════════════ PROYECCIÓN OFICIAL DE CIERRE DE INVENTARIO RESTANTE ═══════════════
   // 1. Ingresos por Entrar
   const remainingInvictaNegotiation = 85000; // 1 Invicta en negociación: $85.000
-  const remainingInvictaStockValue = 320000; // 4 Invictas restantes ($80.000 c/u): $320.000
-  const remainingRolexStockValue = 400000;   // 4 Rolex restantes ($100.000 c/u): $400.000
-  const totalGrossRemainingRevenue = remainingInvictaNegotiation + remainingInvictaStockValue + remainingRolexStockValue; // $805.000
+  const remainingInvictaStockValue = 320000; // 4 Invictas restantes en stock ($80.000 c/u): $320.000
+  const remainingRolexStockValue = 300000;   // 3 Rolex restantes Lote 2 ($100.000 c/u): $300.000
+  
+  // Lote #3 (12 Unidades recién llegadas)
+  const lote3RolexStockValue = 600000;      // 6 Rolex Submariner ($100.000 c/u): $600.000
+  const lote3ProDiverStockValue = 240000;   // 3 Invictas Pro Diver ($80.000 c/u): $240.000
+  const lote3RuletaStockValue = 255000;     // 3 Invictas Ruleta ($85.000 c/u): $255.000
+  const lote3StockValue = lote3RolexStockValue + lote3ProDiverStockValue + lote3RuletaStockValue; // $1.095.000
+
+  // Total ingresos brutos de todo el inventario restante (20 relojes)
+  const totalGrossRemainingRevenue =
+    remainingInvictaNegotiation +
+    remainingInvictaStockValue +
+    remainingRolexStockValue +
+    lote3StockValue; // $1.800.000 COP
+
+  // Ingreso bruto restante solo Lotes 1 y 2 (8 relojes restantes)
+  const totalGrossRemainingLots12 =
+    remainingInvictaNegotiation +
+    remainingInvictaStockValue +
+    remainingRolexStockValue; // $705.000 COP
 
   // 2. Descuento de Inversión Pendiente (Para Quedar en $0 Deuda)
   const pendingInvictaRecovery = 20000; // Faltante para saldar Invictas: $20.000
-  const pendingRolexRecovery = 20000;   // Faltante para saldar Rolex: $20.000
-  const totalPendingInvestmentRecovery = pendingInvictaRecovery + pendingRolexRecovery; // $40.000
+  const pendingRolexRecovery = 0;       // Rolex ya recuperó el 100% de su capital y generó ganancia
+  const totalPendingInvestmentRecovery = pendingInvictaRecovery + pendingRolexRecovery; // $20.000
 
-  // 3. Ganancia Neta Limpia Total: $805.000 - $40.000 = $765.000
-  const netCleanProfitRemaining = totalGrossRemainingRevenue - totalPendingInvestmentRecovery;
-  
-  // 4. Reparto 50/50 con Juan: $382.500 cada uno
-  const netCleanProfit50Each = Math.round(netCleanProfitRemaining * 0.5);
+  // 3. Ganancia Neta Limpia Total
+  // Lotes 1 y 2: $705.000 - $20.000 = $685.000 COP
+  const netCleanProfitLots12 = totalGrossRemainingLots12 - totalPendingInvestmentRecovery;
+  const netCleanProfit50EachLots12 = Math.round(netCleanProfitLots12 * 0.5); // $342.500 c/u
 
-  // 5. Cuentas entre Socios y Liquidación Neta Final
-  const elianRolexAdvance = 60000; // Capital adelantado por Elian para los Rolex a reembolsar ($60.000)
-  // juanRemainingDebt = $37.000 (Juan me debe 37mil)
-  const elianFinalProjectedPayout = netCleanProfit50Each + elianRolexAdvance + juanRemainingDebt; // $479.500
-  const juanFinalProjectedPayout = Math.max(0, netCleanProfit50Each - juanRemainingDebt); // $345.500
+  // Lote 3: $1.095.000 - $407.000 = $688.000 COP
+  const netProfitLote3 = lote3StockValue - lote3LotCost;
+
+  // Total Ganancia Neta Limpia de todo el inventario restante: $685.000 + $688.000 = $1.373.000
+  const netCleanProfitRemaining = netCleanProfitLots12 + netProfitLote3;
+  const netCleanProfit50Each = Math.round(netCleanProfitRemaining * 0.5); // $686.500 c/u
+
+  // 4. Cuentas entre Socios y Liquidación Neta Final
+  // Juan debe $30.000 a Elian
+  const elianFinalProjectedPayout = netCleanProfit50Each + juanRemainingDebt; // $686.500 + $30.000 = $716.500
+  const juanFinalProjectedPayout = Math.max(0, netCleanProfit50Each - juanRemainingDebt); // $686.500 - $30.000 = $656.500
+
+  // Payout específico para cierre de Lotes 1 & 2:
+  const elianLots12Payout = netCleanProfit50EachLots12 + juanRemainingDebt; // $342.500 + $30.000 = $372.500
+  const juanLots12Payout = Math.max(0, netCleanProfit50EachLots12 - juanRemainingDebt); // $342.500 - $30.000 = $312.500
 
   return {
     totalEntriesAll,
@@ -141,6 +184,7 @@ export function calculateFinancials(transactions, lotConfig = { totalCost: 46000
     salesCountCompleted,
     salesCountPending,
     lotBaseCost,
+    totalAllLotsCost,
     lotGrossProfit,
     netProfitEstimated,
     reinvestmentFund50,
@@ -166,22 +210,33 @@ export function calculateFinancials(transactions, lotConfig = { totalCost: 46000
     remainingInvictaNegotiation,
     remainingInvictaStockValue,
     remainingRolexStockValue,
+    lote3RolexStockValue,
+    lote3ProDiverStockValue,
+    lote3RuletaStockValue,
+    lote3StockValue,
+    totalGrossRemainingLots12,
     totalGrossRemainingRevenue,
     pendingInvictaRecovery,
     pendingRolexRecovery,
     totalPendingInvestmentRecovery,
+    netCleanProfitLots12,
+    netCleanProfit50EachLots12,
+    netProfitLote3,
     netCleanProfitRemaining,
     netCleanProfit50Each,
     elianRolexAdvance,
+    elianRolexAdvanceRecovered,
+    netSalesCollected,
     invictaLotCost,
     rolexLotCost,
-    lotsRecoveredCapital: lotBaseCost - totalPendingInvestmentRecovery, // $420.000 COP ya retornados
-    lotsRecoveryPercentage: Math.round(((lotBaseCost - totalPendingInvestmentRecovery) / lotBaseCost) * 100), // 91%
-    totalBusinessProjectedGross: totalSalesCompleted + totalGrossRemainingRevenue, // $240.000 + $805.000 = $1.045.000
+    lote3LotCost,
+    lotsRecoveredCapital: lotBaseCost - totalPendingInvestmentRecovery, // $440.000 COP ya retornados (95.7%)
+    lotsRecoveryPercentage: Math.round(((lotBaseCost - totalPendingInvestmentRecovery) / lotBaseCost) * 100), // 96%
+    totalBusinessProjectedGross: totalSalesCompleted + totalGrossRemainingRevenue, // $550k + $1.800.000 = $2.350.000
     elianFinalProjectedPayout,
     juanFinalProjectedPayout,
-    elianFinalProjectedPayout,
-    juanFinalProjectedPayout,
+    elianLots12Payout,
+    juanLots12Payout,
   };
 }
 

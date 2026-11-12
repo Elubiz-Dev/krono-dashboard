@@ -69,7 +69,7 @@ export function DebtSettleModal({
               </strong>
             </div>
             <p className="text-xs text-dim">
-              Juan aportó inicialmente $80.000 + $13.000 de abonos ($93.000 de sus $130.000 acordados, restando $37.000).
+              Juan aportó inicialmente $80.000 + $20.000 de abonos ($100.000 de sus $130.000 acordados, restando $30.000).
             </p>
           </div>
 

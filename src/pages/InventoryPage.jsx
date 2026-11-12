@@ -46,7 +46,20 @@ const LOT_DEFS = {
     colorLight: "#a5b4fc",
     badgeClass: "badge-indigo",
     icon: Crown,
-    pendingRecovery: 20000,
+    pendingRecovery: 0,
+  },
+  "lote-3": {
+    id: "lote-3",
+    label: "Lote #3 — Expansión & Novedades",
+    shortLabel: "Lote #3 Novedades",
+    totalUnits: 12,
+    investment: 407000,
+    costPerUnit: 33917,
+    color: "#f59e0b",
+    colorLight: "#fcd34d",
+    badgeClass: "badge-amber",
+    icon: Sparkles,
+    pendingRecovery: 0,
   },
 };
 
@@ -257,7 +270,7 @@ export function InventoryPage({
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [copiedSku, setCopiedSku] = useState(null);
-  const [openLots, setOpenLots] = useState({ "invicta-core": true, "rolex-scale": true });
+  const [openLots, setOpenLots] = useState({ "invicta-core": true, "rolex-scale": true, "lote-3": true });
 
   const toggleLot = (lotKey) => {
     setOpenLots(prev => ({ ...prev, [lotKey]: !prev[lotKey] }));

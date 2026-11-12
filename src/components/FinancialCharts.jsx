@@ -148,7 +148,7 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
     ? donutSlices.find((s) => s.id === hoveredDonutSlice) || defaultDonutFocus
     : defaultDonutFocus;
 
-  // ================= 3. CONTROL DE LOTES ACTIVOS (8 INVICTAS & 6 ROLEX) =================
+  // ================= 3. CONTROL DE LOTES ACTIVOS (26 RELOJES EN 3 LOTES) =================
   const activeLotsMetrics = useMemo(() => {
     return {
       invictaTotal: 8,
@@ -159,22 +159,28 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
       invictaDebtRecovery: 20000,
 
       rolexTotal: 6,
-      rolexSold: 2,
-      rolexStock: 4,
-      rolexGrossPending: 4 * 100000, // $400.000 COP
-      rolexDebtRecovery: 20000,
+      rolexSold: 3,
+      rolexStock: 3,
+      rolexGrossPending: 3 * 100000, // $300.000 COP
+      rolexDebtRecovery: 0, // 100% saldado
 
-      totalWatches: 14,
-      totalRemaining: 9,
-      totalGrossPending: 805000,
-      totalDebtRecovery: 40000,
-      totalNetProfit: 765000,
-      partnerBase50: 382500,
+      lote3Total: 12,
+      lote3Stock: 12,
+      lote3GrossPending: 1095000, // 6 Rolex $600k + 3 Pro Diver $240k + 3 Ruleta $255k
+      lote3Cost: 407000,
 
-      juanDebtToElian: 37000,
-      elianRolexAdvance: 60000,
-      elianNetPayout: 479500, // 382.500 + 60.000 + 37.000
-      juanNetPayout: 345500,  // 382.500 - 37.000
+      totalWatches: 26,
+      totalRemaining: 20,
+      totalGrossPending: 1800000,
+      totalDebtRecovery: 20000,
+      totalNetProfit: 1373000,
+      partnerBase50: 686500,
+
+      juanDebtToElian: 30000,
+      elianRolexAdvance: 0,
+      elianRolexAdvanceRecovered: 60000,
+      elianNetPayout: 716500, // 686.500 + 30.000
+      juanNetPayout: 656500,  // 686.500 - 30.000
     };
   }, []);
 
@@ -579,36 +585,77 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
                       <span className="status-dot-pulse bg-indigo" />
                       <strong className="text-white text-base">Lote Rolex (6 Unidades)</strong>
                     </div>
-                    <span className="badge badge-indigo">
-                      2 / 6 Movidos (33%)
+                    <span className="badge badge-emerald">
+                      3 / 6 Vendidos (50%)
                     </span>
                   </div>
 
                   {/* Progress bar */}
                   <div className="fc-lot-progress-bar">
-                    <div className="fc-lot-progress-fill-rolex" style={{ width: "33%" }} />
+                    <div className="fc-lot-progress-fill-rolex" style={{ width: "50%", background: "#10b981" }} />
                   </div>
 
                   <div className="fc-lot-stats-list">
                     <div className="fc-lot-stats-row">
-                      <span>2 Relojes Entregados:</span>
-                      <strong className="mono-num text-indigo">En proceso recaudo</strong>
+                      <span>3 Vendidos & Cobrados:</span>
+                      <strong className="mono-num text-emerald">+ $310.000 COP</strong>
                     </div>
                     <div className="fc-lot-stats-row">
-                      <span>4 Disponibles en Stock:</span>
-                      <strong className="mono-num text-indigo">$400.000 COP</strong>
+                      <span>3 Disponibles en Stock:</span>
+                      <strong className="mono-num text-indigo">$300.000 COP</strong>
                     </div>
                     <div className="fc-lot-stats-row">
                       <span>Precio Sugerido Pro:</span>
                       <strong className="mono-num text-slate-300">$100.000 COP c/u</strong>
                     </div>
                     <div className="fc-lot-stats-row highlight-row">
-                      <span>Recaudo bruto restante (4 Rolex):</span>
-                      <strong className="mono-num text-white">$400.000 COP</strong>
+                      <span>Recaudo bruto restante (3 Rolex):</span>
+                      <strong className="mono-num text-white">$300.000 COP</strong>
                     </div>
                     <div className="fc-lot-stats-row" style={{ fontSize: "0.75rem" }}>
                       <span>Faltante p/ saldar inversión:</span>
-                      <strong className="mono-num text-rose">-$20.000 COP ($0 deuda)</strong>
+                      <strong className="mono-num text-emerald">$0 (100% Saldado + Ganancia)</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card 3: Lote #3 Expansión */}
+                <div className="fc-lot-card" style={{ border: "1px solid rgba(245, 158, 11, 0.35)", background: "rgba(245, 158, 11, 0.04)" }}>
+                  <div className="fc-lot-title-row">
+                    <div className="flex-row items-center gap-2">
+                      <span className="status-dot-pulse bg-amber" />
+                      <strong className="text-white text-base">Lote #3 Novedades (12 Unidades)</strong>
+                    </div>
+                    <span className="badge badge-amber">
+                      ¡Recién Llegado!
+                    </span>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="fc-lot-progress-bar">
+                    <div style={{ width: "100%", height: "100%", background: "linear-gradient(90deg, #f59e0b, #e5b869)", borderRadius: 6 }} />
+                  </div>
+
+                  <div className="fc-lot-stats-list">
+                    <div className="fc-lot-stats-row">
+                      <span>6 Rolex Submariner ($100k):</span>
+                      <strong className="mono-num text-indigo">$600.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row">
+                      <span>3 Invictas Pro Diver ($80k):</span>
+                      <strong className="mono-num text-emerald">$240.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row">
+                      <span>3 Invictas Ruleta ($85k):</span>
+                      <strong className="mono-num text-amber">$255.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row highlight-row">
+                      <span>Valor comercial Lote 3:</span>
+                      <strong className="mono-num text-white">$1.095.000 COP</strong>
+                    </div>
+                    <div className="fc-lot-stats-row" style={{ fontSize: "0.75rem" }}>
+                      <span>Ganancia neta proyectada:</span>
+                      <strong className="mono-num text-emerald">+$688.000 COP</strong>
                     </div>
                   </div>
                 </div>
@@ -617,32 +664,32 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
               {/* Strip Consolidado de Liquidación Total */}
               <div className="fc-thermo-stats-strip">
                 <div className="fcts-item">
-                  <span>Ingreso Bruto por Entrar (9 Relojes):</span>
+                  <span>Ingreso Bruto por Entrar (20 Relojes):</span>
                   <strong className="text-white mono-num" style={{ fontSize: "1.25rem" }}>
-                    $805.000
+                    $1.800.000
                   </strong>
                   <small style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>
-                    1 Invicta @85k + 4 Invicta @80k + 4 Rolex @100k
+                    5 Invictas L1 + 3 Rolex L2 + 12 Lote 3
                   </small>
                 </div>
                 <div className="fcts-div" />
                 <div className="fcts-item">
-                  <span>Saldar Inversiones ($0 Deuda):</span>
+                  <span>Saldar Inversión L1 ($0 Deuda):</span>
                   <strong className="text-rose mono-num" style={{ fontSize: "1.25rem" }}>
-                    -$40.000
+                    -$20.000
                   </strong>
                   <small style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>
-                    -$20k Invictas | -$20k Rolex
+                    -$20k Invictas | Rolex 100% saldado
                   </small>
                 </div>
                 <div className="fcts-div" />
                 <div className="fcts-item">
                   <span>Ganancia Neta Limpia Total:</span>
                   <strong className="text-emerald mono-num" style={{ fontSize: "1.25rem" }}>
-                    $765.000
+                    $1.373.000
                   </strong>
                   <small style={{ fontSize: "0.72rem", color: "var(--emerald-light)" }}>
-                    Reparto 50/50: $382.500 c/u
+                    Reparto 50/50: $686.500 c/u
                   </small>
                 </div>
               </div>
@@ -668,13 +715,13 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
                         <span className="badge badge-emerald" style={{ fontSize: "0.7rem", padding: "2px 6px" }}>Cofundador</span>
                       </div>
                       <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "2px" }}>
-                        <div>+ $382.500 (Ganancia base 50%)</div>
-                        <div>+ $60.000 (Recuperación anticipo Rolex)</div>
-                        <div>+ $37.000 (Cobro deuda pendiente de Juan)</div>
+                        <div>+ $686.500 (Ganancia base 50%)</div>
+                        <div>+ $30.000 (Cobro deuda pendiente de Juan)</div>
+                        <div className="text-emerald font-medium">✓ $60.000 préstamo Rolex ya recuperado</div>
                       </div>
                       <div className="flex-between items-center pt-2 mt-1 border-t border-white/10">
-                        <span style={{ fontSize: "0.8rem", color: "#fff" }}>Liquidación final:</span>
-                        <strong className="mono-num text-white text-base">$479.500 COP</strong>
+                        <span style={{ fontSize: "0.8rem", color: "#fff" }}>Liquidación a recibir:</span>
+                        <strong className="mono-num text-white text-base">$716.500 COP</strong>
                       </div>
                     </div>
 
@@ -685,13 +732,13 @@ export function FinancialCharts({ financials: fin, transactions, formatCOP }) {
                         <span className="badge badge-indigo" style={{ fontSize: "0.7rem", padding: "2px 6px" }}>Cofundador</span>
                       </div>
                       <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "2px" }}>
-                        <div>+ $382.500 (Ganancia base 50%)</div>
-                        <div>- $37.000 (Descuento de su deuda con Elian)</div>
+                        <div>+ $686.500 (Ganancia base 50%)</div>
+                        <div>- $30.000 (Descuento de su deuda con Elian)</div>
                         <div style={{ visibility: "hidden" }}>-</div>
                       </div>
                       <div className="flex-between items-center pt-2 mt-1 border-t border-white/10">
-                        <span style={{ fontSize: "0.8rem", color: "#fff" }}>Liquidación final:</span>
-                        <strong className="mono-num text-white text-base">$345.500 COP</strong>
+                        <span style={{ fontSize: "0.8rem", color: "#fff" }}>Liquidación a recibir:</span>
+                        <strong className="mono-num text-white text-base">$656.500 COP</strong>
                       </div>
                     </div>
                   </div>
