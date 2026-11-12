@@ -18,6 +18,7 @@ import {
   Copy,
   ChevronDown,
   ChevronUp,
+  Sparkles,
 } from "lucide-react";
 
 // ═══════════════════════ LOT DEFINITIONS ═══════════════════════

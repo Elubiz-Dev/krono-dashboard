@@ -5,15 +5,15 @@ import confetti from "canvas-confetti";
 export function DebtSettleModal({
   isOpen,
   onClose,
-  remainingDebt,
+  remainingDebt = 0,
   onSettleDebt,
   formatCOP,
 }) {
-  if (!isOpen) return null;
-
-  const [amount, setAmount] = useState(remainingDebt > 0 ? String(Math.min(20000, remainingDebt)) : "");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [amount, setAmount] = useState(() => (remainingDebt > 0 ? String(Math.min(20000, remainingDebt)) : ""));
+  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [notes, setNotes] = useState("Abono a deuda de lote entregado a Elian");
+
+  if (!isOpen) return null;
 
   const quickAmounts = [
     { label: "$10.000", val: 10000 },
